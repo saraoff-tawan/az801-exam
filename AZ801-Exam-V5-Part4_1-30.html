@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Simulator - Template</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; max-width: 850px; margin: 0 auto; padding: 20px; line-height: 1.6;}
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .status-bar { display: flex; justify-content: space-between; margin-bottom: 20px; color: #222; font-weight: bold; font-size: 1.2em; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;}
+        .question-badge { background-color: #0078d4; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+        .question { font-size: 1.1em; margin-bottom: 20px;}
+        
+        /* แผงปุ่มกดข้ามข้อ (Navigation Grid) */
+        .nav-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; padding: 10px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; justify-content: center; }
+        .nav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background: white; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95em;}
+        .nav-btn:hover { background: #f0f0f0; border-color: #0078d4; }
+        .nav-btn.active { background: #0078d4; color: white; border-color: #0078d4; box-shadow: 0 2px 5px rgba(0,120,212,0.4); }
+        .nav-btn.answered-correct { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .nav-btn.answered-wrong { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+        /* สไตล์ตารางโจทย์ทั่วไป */
+        /* สไตล์ตารางโจทย์ทั่วไป */
+	.info-table { width: auto; min-width: 50%; max-width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95em; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .info-table th, .info-table td { border: 1px solid #aaa; padding: 8px; }
+        .info-table th { background: #e9ecef; text-align: left; }
+
+        /* ตัวเลือก MCQ (Radio และ Checkbox) */
+        .options label { display: block; padding: 15px; margin: 10px 0; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; cursor: pointer; transition: 0.2s;}
+        .options label:hover { background: #e2e6ea; }
+        input[type="radio"], input[type="checkbox"] { transform: scale(1.2); cursor: pointer; margin-right: 8px;}
+        
+        /* สไตล์ Drag & Drop (รองรับหลายกล่อง) */
+        .dd-wrapper { display: flex; gap: 20px; margin-top: 15px; align-items: flex-start; }
+        .dd-box { flex: 1; padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #fafafa; min-height: 200px; }
+        .dd-box h4 { margin-top: 0; color: #555; text-align: center; margin-bottom: 15px;}
+        .draggable { background: #0078d4; color: white; padding: 12px; margin-bottom: 10px; border-radius: 5px; cursor: grab; text-align: left; font-weight: 500; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        .draggable:active { cursor: grabbing; }
+        
+        /* กล่องเป้าหมายสำหรับลากวาง */
+        .target-container { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .target-area { padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #f0f8ff; min-height: 100px; }
+        .target-label { font-weight: bold; margin-bottom: 10px; color: #333; text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
+
+        /* สไตล์ Hotspot (ตาราง Yes/No) */
+        .hotspot-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        .hotspot-table th, .hotspot-table td { border: 1px solid #ccc; padding: 12px; }
+        .hotspot-table th { background: #0078d4; color: white; text-align: center; font-weight: bold; }
+        .hotspot-table td:first-child { width: 70%; font-weight: 500; }
+        .hotspot-table td:not(:first-child) { text-align: center; width: 15%; background: #f8f9fa; cursor: pointer;}
+
+        /* สไตล์ Dropdown */
+        .dd-area { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin-top: 15px; text-align: left; display: block; width: auto; overflow-x: auto}
+        .dd-row { margin-bottom: 10px; display: flex; align-items: center; flex-wrap: nowrap;}
+        .dd-label { width: 200px; text-align: right; margin-right: 15px; font-weight: bold; }
+        .dd-select { padding: 5px; font-size: 1em; width: auto; max-width: 170px; border: 1px solid #ccc; border-radius: 4px; }
+
+        /* ปุ่มและเฉลย */
+        .button-group { display: flex; justify-content: space-between; margin-top: 25px; }
+        .btn { background: #0078d4; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: bold;}
+        .btn:hover { background: #005a9e; }
+        .btn-secondary { background: #6c757d; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .explanation { margin-top: 25px; padding: 20px; border-radius: 5px; display: none; }
+        .correct-box { background: #d4edda; border-left: 5px solid #28a745; color: #155724; }
+        .incorrect-box { background: #f8d7da; border-left: 5px solid #dc3545; color: #721c24; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="navigation-grid" class="nav-grid"></div>
+
+        <div class="status-bar">
+            <span id="question-counter">Question: 1</span>
+            <span id="score-counter">Score: 0</span>
+        </div>
+        
+        <div id="question-text" class="question">Loading...</div>
+        
+        <div id="options-container" class="options" style="display: none;"></div>
+        
+        <div id="dragdrop-container" class="dd-wrapper" style="display: none;">
+            <div class="dd-box" id="source-box" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h4>Options</h4>
+            </div>
+            <!-- กล่องเป้าหมายจะถูกสร้างที่นี่ -->
+            <div id="targets-wrapper" class="target-container"></div>
+        </div>
+
+        <div id="hotspot-container" style="display: none;"></div>
+        <div id="dropdown-container" style="display: none;"></div>
+        
+<div class="button-group">
+
+    <div>
+        <button class="btn btn-secondary"
+            onclick="window.location.href='../index.html'">
+            🏠 Main Menu
+        </button>
+
+        <button class="btn btn-secondary"
+            id="prev-btn"
+            onclick="prevQuestion()">
+            &laquo; Back
+        </button>
+    </div>
+
+    <div>
+        <button class="btn" id="submit-btn"
+            onclick="checkAnswer()">
+            Submit Answer
+        </button>
+
+        <button class="btn"
+            id="next-btn"
+            onclick="nextQuestion()"
+            style="display:none;background:#28a745;">
+            Next Question &raquo;
+        </button>
+    </div>
+
+</div>        
+        <div id="explanation-box" class="explanation"></div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 🚨 นำโจทย์ข้อสอบมาวางใน Array นี้
+        // ==========================================
+        const quizData = [
+	    // ==========================================
+            // Question 1 (Topic 4 - Azure Migrate Physical Servers)
+            // ==========================================
+            {
+                topic: "Topic 4",
+                type: "dragdrop",
+                question: "DRAG DROP - <br>You manage 200 physical servers that run Windows Server.<br>" +
+                          "You plan to migrate the servers to Azure.<br>" +
+                          "You need to prepare for discovery of the servers by using Azure Migrate.<br><br>" +
+                          "Which three actions should you perform in sequence on a physical server? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+                draggables: [
+                    "Download and extract the Azure Migrate installer script ZIP file.", 
+                    "Download and extract the Azure Migrate Appliance VHD file.", 
+                    "Run AzureMirgrateInstaller.ps1.", 
+                    "Import a virtual machine.", 
+                    "Configure the appliance and register the appliance with Azure Migrate."
+                ],
+                correctOrder: [
+                    "Download and extract the Azure Migrate installer script ZIP file.", 
+                    "Run AzureMirgrateInstaller.ps1.", 
+                    "Configure the appliance and register the appliance with Azure Migrate."
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "เนื่องจากเซิร์ฟเวอร์ต้นทางเป็น <b>Physical Servers (เครื่องจริง)</b> ไม่ใช่ VM ดังนั้นคุณจะไม่สามารถโหลดเป็นไฟล์ VHD หรือ OVA มาอิมพอร์ตได้ครับ สิ่งที่คุณต้องทำคือ:<br>" +
+                             "<b>1. Download installer script ZIP file:</b> โหลดชุดสคริปต์ติดตั้งสำหรับ Physical Server จาก Azure Migrate<br>" +
+                             "<b>2. Run AzureMigrateInstaller.ps1:</b> สั่งรันสคริปต์บนเครื่องที่คุณจะตั้งให้เป็น Appliance<br>" +
+                             "<b>3. Configure and register:</b> ทำการคอนฟิกตัว Appliance และลงทะเบียนเชื่อมโยงเข้ากับโปรเจกต์ Azure Migrate บนคลาวด์ครับ"
+            },
+            // ==========================================
+            // Question 2 (Topic 4 - Raise Forest Functional Level)
+            // ==========================================
+            {
+                type: "dragdrop",
+                question: "DRAG DROP - <br>Your network contains an Active Directory Domain Services (AD DS) domain named contoso.com.<br>" +
+                          "The functional level of the forest and the domain is Windows Server 2012 R2. The domain contains the domain controllers shown in the following table.<br><br>" +
+                          "<table class='info-table'><tr><th>Name</th><th>Operating system</th><th>FSMO role</th></tr>" +
+                          "<tr><td>DC1</td><td>Windows Server 2012 R2</td><td>All</td></tr>" +
+                          "<tr><td>DC2</td><td>Windows Server 2022</td><td>None</td></tr>" +
+                          "<tr><td>DC3</td><td>Windows Server 2019</td><td>None</td></tr></table><br>" +
+                          "You need to raise the forest functional level to Windows Server 2016. The solution must meet the following requirements:<br>" +
+                          "• Ensure that there are three domain controllers after you raises the level.<br>" +
+                          "• Minimize how long the FSMO roles are unavailable.<br><br>" +
+                          "Which three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+                draggables: [
+                    "Install the Active Directory Migration Tool (ADMT).", 
+                    "Deploy an additional domain controller.", 
+                    "Raise the domain and forest functional level.", 
+                    "Upgrade DC3.", 
+                    "Migrate computer accounts by using the Active Directory Migration Tool (ADMT).", 
+                    "Upgrade DC1.", 
+                    "Create a custom AD DS partition.", 
+                    "Move the FSMO roles to DC2."
+                ],
+                correctOrder: [
+                    "Move the FSMO roles to DC2.", 
+                    "Upgrade DC1.", 
+                    "Raise the domain and forest functional level."
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "การจะยก Functional Level เป็น 2016 ได้ โดเมนคอนโทรลเลอร์<b>ทุกเครื่อง</b>ในป่าจะต้องเป็น OS 2016 ขึ้นไป ซึ่งปัญหาอยู่ที่ DC1 ยังเป็น 2012 R2 ครับ<br>" +
+                             "<b>1. Move the FSMO roles to DC2:</b> เพื่อ 'minimize downtime' ของ FSMO คุณต้องย้าย FSMO หนีออกจาก DC1 ไปไว้ที่ DC2 ที่เป็น OS ใหม่ล่าสุดเสียก่อน<br>" +
+                             "<b>2. Upgrade DC1:</b> ทำการ In-place Upgrade เครื่อง DC1 ให้เป็น OS ใหม่ (เช่น 2016 หรือใหม่กว่า) เพื่อให้มันผ่านเกณฑ์<br>" +
+                             "<b>3. Raise the domain and forest functional level:</b> เมื่อทุกเครื่องเป็นรุ่นใหม่หมดแล้ว ก็สามารถกดปุ่มยกระดับ Functional Level ให้เป็น 2016 ได้เลยครับ (และคุณก็ยังคงมี DC 3 เครื่องครบตามเดิม)<br>" +
+			     "<b>Raise the Domain Functional Level =</b> ปลดล็อกฟีเจอร์ใหม่ของ Active Directory ในระดับ Domain หลังจาก Domain Controller ทุกเครื่องรองรับเวอร์ชันที่ต้องการแล้ว"
+            },
+            // ==========================================
+            // Question 3 (Topic 4 - Hybrid Connection)
+            // ==========================================
+            {
+                question: "You have an on-premises server that runs Windows Server and has the Web Server (IIS) server role installed.<br>" +
+                          "The server hosts a web app that connects to an on-premises Microsoft SQL Server database.<br>" +
+                          "You plan to migrate the web app to an Azure App Services web app. The database will remain on-premises.<br>" +
+                          "You need to ensure that the migrated web app can access the database.<br><br>" +
+                          "What should you configure in Azure?",
+                options: [
+                    "A. an Azure SQL managed instance",
+                    "B. an on-premises data gateway",
+                    "C. Azure Extended Network",
+                    "D. a Hybrid Connection"
+                ],
+                correctAnswerIndex: 3, // D
+                explanation: "✅ <b>Explanation:</b><br><b>D. a Hybrid Connection</b> is correct.<br><br><b>เหตุผล:</b> เพื่อที่จะให้ <b>Azure App Service</b> (Web App บนคลาวด์) สามารถเจาะทะลุเข้ามาดึงข้อมูลจาก SQL Database ที่อยู่บน <b>On-premises (หลัง Firewall)</b> ได้อย่างปลอดภัยและง่ายที่สุด ฟีเจอร์เฉพาะตัวของ App Service ที่คุณต้องเปิดใช้งานคือ <b>Hybrid Connection</b> ครับ (โดยคุณจะต้องลงตัว Hybrid Connection Manager ไว้ที่ฝั่ง On-prem ด้วยมันจะทำหน้าที่วิ่งออกไปหา Azure ผ่านพอร์ต 443 (Outbound) เพื่อสร้างอุโมงค์เชื่อมต่อให้เอง)"
+            },
+            // ==========================================
+            // Question 4 (Topic 4 - Storage Migration Service)
+            // ==========================================
+            {
+                question: "You have two file servers named Server1 and Server2 that run Windows Server. Server1 contains a shared folder named Data.<br>" +
+                          "Data contains 10 TB of data.<br>" +
+                          "You plan to decommission Server1.<br>" +
+                          "You need to migrate the files from Data to a new shared folder on Server2.<br>" +
+                          "The solution must meet the following requirements:<br>" +
+                          "• Ensure that share, file, and folder permissions are copied.<br>" +
+                          "• After the initial copy occurs, ensure that changes in \\\\Server1\\Data can be synced to the destination without initiating a full copy.<br>" +
+                          "• Minimize administrative effort.<br><br>" +
+                          "What should you use?",
+                options: [
+                    "A. xcopy",
+                    "B. Storage Replica",
+                    "C. Storage Migration Service",
+                    "D. azcopy"
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. Storage Migration Service</b> is correct.<br><br><b>เหตุผล:</b> พระเอกของงานนี้คือ <b>Storage Migration Service (SMS)</b> ใน Windows Admin Center ครับ เพราะมันถูกออกแบบมาให้ก๊อปปี้ข้อมูล 10TB พร้อมพ่วงสิทธิ์ (Permissions) และ Shares มาได้ครบถ้วน และที่สำคัญคือ มันรองรับการทำ <b>Delta Sync</b> (ซิงค์เฉพาะสิ่งที่เปลี่ยนไปหลังจากการก๊อปปี้รอบแรก) เพื่อเตรียมความพร้อมก่อนทำการสลับเครื่อง (Cutover) ได้แบบเนียนๆ เลยครับ"
+            },
+            // ==========================================
+            // Question 5 (Topic 4 - DHCP Export/Import)
+            // ==========================================
+            {
+                type: "hotspot",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain.<br>" +
+                          "The domain contains the servers shown in the following table.<br>" +
+                          "<table class='info-table'><tr><th>Name</th><th>Operating system</th><th>Server role</th></tr>" +
+                          "<tr><td>Server1</td><td>Windows Server 2019</td><td>DHCP Server</td></tr>" +
+                          "<tr><td>Server2</td><td>Windows Server 2022</td><td>DHCP Server</td></tr>" +
+                          "<tr><td>Server3</td><td>Windows Server 2019</td><td>File Server</td></tr></table>" +
+                          "Server3 contains a share named Share1.<br>" +
+                          "On Server1, DHCP has the following configurations:<br>" +
+                          "• Conflict detection attempts: 3<br>" +
+                          "• An IPv4 scope named Scope1 that has the following settings:<br>" +
+                          "&nbsp;&nbsp;&nbsp;&nbsp;1. Address Pool:<br>" +
+			  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-172.16.10.100-172.16.10.130.<br>" +
+                          "&nbsp;&nbsp;&nbsp;&nbsp;2. Address Leases:<br>" +
+                          "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-172.16.10.100 computer1.contoso.com<br>" +
+                          "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-172.16.10.101 computer2.contoso.com<br>" +
+                          "• Reservations:<br>" +
+			  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-172.16.10.101 computer2.contoso.com<br>" +
+                          "• Policies: Policy1<br>" +
+                          "<b>You perform the following actions:</b><br>" +
+                          "- On Server1, you run -<br>" +
+                          "<code>Export-DhcpServer -File \\\\Server3\\Share1\\File1.xml</code><br>" +
+                          "- On Server2, you run -<br>" +
+                          "<code>Import-DhcpServer -File \\\\Server3\\Share1\\File1.xml -BackupPath \\\\Server3\\Share1</code><br><br>" +
+                          "For each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+                statements: [
+                    {text: "On Server2, Conflict detection attempts is set to 3.", correctAnswer: "Yes"}, 
+                    {text: "On Server2, there is a reservation for computer2.contoso.com.", correctAnswer: "Yes"}, 
+                    {text: "On Server2, Policy1 is applied to Scope1.", correctAnswer: "Yes"}
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "คำสั่ง <code>Export-DhcpServer</code> (ที่ไม่ได้ระบุ -ScopeId) จะทำการดึงคอนฟิกทั้งหมดของ Server รวมถึง Scopes ต่างๆ ไปเป็น XML ทั้งก้อน<br>" +
+                             "เมื่อฝั่ง Server2 ใช้คำสั่ง <code>Import-DhcpServer</code> (ที่ไม่ได้ระบุ -ScopeId เช่นกัน) กฎของคำสั่งนี้คือ <b>มันจะดึงทั้งคอนฟิกของ Scope และคอนฟิกของ Server Level มาลงให้ทั้งหมด</b> ครับ!<br><br>" +
+                             "<b>1. Yes:</b> Conflict detection attempts เป็น 'Server-level config' ซึ่งมันจะถูกพอร์ตมาทับค่าเดิมด้วย<br>" +
+                             "<b>2. Yes:</b> Reservation เป็นคอนฟิกที่ฝังอยู่ใน Scope มันจึงมาด้วยแน่นอน<br>" +
+                             "<b>3. Yes:</b> Policy เป็นคอนฟิกที่ฝังอยู่ใน Scope มันจึงมาด้วยเช่นกันครับ<br>" +
+                             "<i>(ข้อควรระวัง: สิ่งที่จะ 'ไม่มาด้วย' หากคุณไม่ได้ใส่พารามิเตอร์ <code>-Leases</code> ตอน Export คือ 'IP Leases' (ประวัติการแจกไอพี) ครับ แต่โจทย์ข้อนี้ถามหา Reservation ไม่ใช่ Lease ดังนั้นจึงตอบ Yes รวดเลยครับ)</i>"
+            },
+// ==========================================
+            // Question 6 (Topic 4 - Docker Deployment to Azure Container Registry)
+            // ==========================================
+            {
+                topic: "Topic 4",
+                type: "dragdrop",
+                question: "DRAG DROP - <br>You have a server named Server1 that runs Windows Server and has the Web Server (IIS) server role installed.<br>" +
+                          "Server1 hosts an ASP.NET Core web app named WebApp1 and the app's source files.<br>" +
+                          "You install Docker on Server1.<br>" +
+                          "You need to ensure that you can deploy WebApp1 to an Azure App Service web app from the Azure Container Registry.<br><br>" +
+                          "Which three actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+                draggables: [
+                    "Run the docker push command.",
+                    "Run the docker run command.",
+                    "Run the docker build command.",
+                    "Create a Dockerfile.",
+                    "Create an Azure Resource Manager (ARM) template.",
+                    "Run the docker pull command."
+                ],
+                correctOrder: [
+                    "Create a Dockerfile.",
+                    "Run the docker build command.",
+                    "Run the docker push command."
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "นี่คือพื้นฐานของการสร้างและส่ง Docker Image ขึ้น Cloud ครับ:<br>" +
+                             "<b>Step 1: Create a Dockerfile.</b> คุณต้องมีไฟล์คำสั่ง (Dockerfile) ก่อน เพื่อบอกว่าจะให้เอา Source code ตัวไหนมารวมกับ Base Image อะไร<br>" +
+                             "<b>Step 2: Run the docker build command.</b> สั่ง Build ตัว Dockerfile ที่เขียนไว้ให้กลายเป็น Image ก้อนหนึ่งบน Server1<br>" +
+                             "<b>Step 3: Run the docker push command.</b> อัปโหลด (Push) Image ที่เราเพิ่งสร้างเสร็จ ส่งขึ้นไปเก็บบน Azure Container Registry ครับ"
+            },
+            // ==========================================
+            // Question 7 (Topic 4 - Web Deploy Sync)
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have two servers that have the Web Server (IIS) server role installed.<br>" +
+                          "The servers are configured as shown in the following table.<br>" +
+                          "<table class='info-table'><tr><th>Name</th><th>Operating system</th></tr>" +
+                          "<tr><td>Server1</td><td>Windows Server 2016</td></tr>" +
+                          "<tr><td>Server2</td><td>Windows Server 2022</td></tr></table><br>" +
+                          "Both servers are configured to enable website deployment by using the Web Deployment Tool.<br>" +
+                          "Server1 hosts a website named Site1 that has Web Deploy Publishing configured.<br>" +
+                          "You plan to migrate Site1 to Server2.<br>" +
+                          "You need to perform a pull synchronization of Site1 by using the Web Deployment Agent Service.<br><br>" +
+                          "How should you complete the command? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q7-dd1", 
+                        label: "msdeploy -verb:sync -source:", 
+                        options: ["apphostconfig=Site1", "apphostconfig=Site1,computername=Server1", "apphostconfig=Site1,computername=Server2", "package=c:\\site1.zip"], 
+                        correctAnswer:"apphostconfig=Site1,computername=Server1" 
+                    },
+                    { 
+                        id: "q7-dd2", 
+                        label: "-dest:", 
+                        options: ["apphostconfig=Site1", "apphostconfig=Site1,computername=Server1", "apphostconfig=Site1,computername=Server2", "package=c:\\site1.zip"], 
+                        correctAnswer: "apphostconfig=Site1" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "โจทย์สั่งให้ทำ <b>'Pull synchronization'</b> ซึ่งก็คือการรันคำสั่ง <b>บนเครื่องปลายทาง (Server2)</b> เพื่อดึง (Pull) ข้อมูลจากเครื่องต้นทางมาใส่ตัวเองครับ:<br><br>" +
+                             "<b>1. -source (ดึงมาจากไหน?):</b> <code>apphostconfig=\"Site1\",computername=Server1</code> (ไปดึงคอนฟิกของ Site1 มาจากเครื่องที่ชื่อ Server1 นะ)<br>" +
+                             "<b>2. -dest (เอามาใส่ที่ไหน?):</b> <code>apphostconfig=\"Site1\"</code> (เอามาใส่ที่ Site1 ของเครื่องปัจจุบันที่กำลังรันคำสั่งอยู่นี้ ซึ่งก็คือ Server2 นั่นเอง ไม่ต้องใส่ชื่อเครื่องตัวเองครับ)"
+            },
+            // ==========================================
+            // Question 8 (Topic 4 - App Service Migration Assistant)
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have a server that runs Windows Server and has the Web Server (IIS) server role installed.<br>" +
+                          "Server1 hosts a single website that has the following configurations:<br>" +
+                          "• Is accessible by using a URL of https://www.contoso.com:8443 and has an SSL certificate that was issued by a third-party certification authority (CA) in the Microsoft Trusted Root Program.<br>" +
+                          "• Uses anonymous authentication.<br>" +
+                          "• Was developed by using PHP.<br><br>" +
+                          "You plan to use APP Service Migration Assistant to migrate the website to Azure App Service.<br>" +
+                          "You need to migrate the website. The solution must minimize the number of changes made to the existing website.<br><br>" +
+                          "What should you do manually to ensure that the website migration is successful? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q8-dd1", 
+                        label: "On Server1:", 
+                        options: ["Change the authentication method.", "Change the listening port of the website.", "Redevelop the website code by using ASP.NET."], 
+                        correctAnswer: "Change the listening port of the website." 
+                    },
+                    { 
+                        id: "q8-dd2", 
+                        label: "In Azure:", 
+                        options: ["Create an App Service plan.", "Copy the source files of the website.", "Configure a certificate and a custom domain name."], 
+                        correctAnswer: "Configure a certificate and a custom domain name." 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "<b>1. On Server1: Change the listening port of the website.</b><br>App Service Migration Assistant จะสแกนและทำงานได้ดีที่สุดกับพอร์ตมาตรฐาน (80, 443) ครับ การที่เว็บใช้พอร์ตแปลกๆ อย่าง <b>8443</b> อาจทำให้ Tool อพยพทำงานผิดพลาด จึงควรแก้กลับมาเป็นพอร์ตมาตรฐานก่อน<br><br>" +
+                             "<b>2. In Azure: Configure a certificate and a custom domain name.</b><br>App Service Migration Assistant จะไม่สามารถอพยพ Custom Domain และ Certificate ที่ออกโดย 3rd-party ให้คุณได้อัตโนมัติครับ คุณจะต้องไปผูก Domain (www.contoso.com) และอัปโหลด SSL Certificate เข้าไปใน Azure App Service ด้วยตัวเอง (Manual) ครับ"
+            },
+            // ==========================================
+            // Question 9 (Topic 4 - Printer Migration Wizard)
+            // ==========================================
+            {
+                type: "dragdrop",
+                question: "DRAG DROP - <br>Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains a print server named Server1. All printers are deployed to users by using a Group Policy Object (GPO) named GPO1.<br>" +
+                          "You deploy a new server named Server2.<br>" +
+                          "You need to decommission Server1. The solution must meet the following requirements:<br>" +
+                          "• Migrate the shared printers to Server2 by using the Printer Migration Wizard.<br>" +
+                          "• Ensure that the users use the printers on Server2.<br>" +
+                          "• Minimize downtime for the users.<br><br>" +
+                          "Which four actions should you perform in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
+                draggables: [
+                    "Decommission Server1.",
+                    "Import the printers on Server2.",
+                    "Deploy Windows Server Hybrid Cloud Print.",
+                    "Export the printers on Server1.",
+                    "Update the service principal name (SPN) of each printer.",
+                    "Modify GPO1."
+                ],
+                correctOrder: [
+                    "Export the printers on Server1.",
+                    "Import the printers on Server2.",
+                    "Modify GPO1.",
+                    "Decommission Server1."
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "การย้าย Print Server ด้วยวิธีมาตรฐาน มีลำดับดังนี้:<br>" +
+                             "<b>1. Export the printers on Server1:</b>ใช้Printer Migration Wizard ดึงข้อมูลตั้งต้นออกมาก่อน โดยไปรันการ Export ที่เครื่องต้นทาง (Server1) ซึ่งจะได้ไฟล์นามสกุล .printerExport ออกมาก่อน<br>" +
+                             "<b>2. Import the printers on Server2:</b>จากนั้นก็นำไฟล์นี้ไป Import เข้าที่เครื่องปลายทาง (Server2) เพื่อสร้างคิวเครื่องพิมพ์และดึงไดรเวอร์ต่างๆ<br>" +
+                             "<b>3. Modify GPO1:</b> หลังจากที่ Server2 มีเครื่องพิมพ์พร้อมให้บริการแล้ว ผู้ใช้ทั่วไปจะยังไม่รู้ตัวครับ เพราะใน GPO1 ยังคงชี้เป้าหมายไปที่ \\Server1\PrinterName อยู่ ดังนั้นเราจึงต้องเข้าไป แก้ไข (Modify) GPO1 ให้ชี้เส้นทางใหม่ไปที่ \\Server2\PrinterName เพื่อให้เครื่องคอมพิวเตอร์ของยูสเซอร์อัปเดตและมองเห็นเซิร์ฟเวอร์ใหม่<br>" +
+                             "<b>4. Decommission Server1:</b>โจทย์เน้นย้ำว่า Minimize downtimeดังนั้นเราจะปิด Server1 ทิ้งไม่ได้จนกว่าจะแน่ใจว่าผู้ใช้ทุกคนย้ายไปเกาะ Server2 ผ่าน GPO ที่อัปเดตเรียบร้อยแล้ว การปลดระวางหรือปิด Server1 จึงต้องเป็น ขั้นตอนสุดท้าย เสมอ"
+            },
+            // ==========================================
+            // Question 10 (Topic 4 - Azure Migrate Registration)
+            // ==========================================
+            {
+                type: "multiple_select",
+                question: "You have a server named Server1 that runs Windows Server and has the Hyper-V server role installed.<br>" +
+                          "You import the Azure Migrate appliance as VM1.<br>" +
+                          "You need to register VM1 with Azure Migrate.<br><br>" +
+                          "What should you do in Azure Migrate? Each correct answer presents part of the solution.",
+                options: [
+                    "A. Create a project.",
+                    "B. Add a migration tool.",
+                    "C. Add an assessment tool.",
+                    "D. Generate a project key.",
+                    "E. Download the Azure Migrate installer script ZIP file."
+                ],
+                correctAnswerIndex: [0, 3], // A, D
+                explanation: "✅ <b>Explanation:</b><br><b>A. Create a project.</b> and <b>D. Generate a project key.</b> are correct.<br><br><b>เหตุผล:</b> ในการลงทะเบียน (Register) ตัว Azure Migrate Appliance (ที่รันอยู่บน On-prem) ให้เชื่อมต่อกับคลาวด์ได้นั้น คุณจะต้อง <b>สร้างโปรเจกต์ (Create a project)</b> บน Azure ก่อน จากนั้นกด <b>Generate a project key</b> เอาคีย์ที่ได้ไปวางใส่ในตัว Appliance เพื่อทำการจับคู่ (Register) ครับ"
+            },
+            // ==========================================
+            // Question 11 (Topic 4 - Storage Migration vs Azure File Sync vs Azure Backup)
+            // ==========================================
+            {
+                question: "You have two servers that run Windows Server as shown in the following table.<br><br>" +
+                          "<table class='info-table'><tr><th>Name</th><th>Location</th><th>Domain/workgroup</th></tr>" +
+                          "<tr><td>Server1</td><td>On-premises</td><td>Domain</td></tr>" +
+                          "<tr><td>Server2</td><td>Azure virtual machine</td><td>Workgroup</td></tr></table><br>" +
+                          "You need to copy the contents of volume E from Server1 to Server2. The solution must meet the following requirements:<br>" +
+                          "• Ensure that files in-use are copied.<br>" +
+                          "• Minimize administrative effort.<br><br>" +
+                          "What should you use?",
+                options: [
+                    "A. Storage Migration Service",
+                    "B. Azure File Sync",
+                    "C. Azure Backup",
+                    "D. Storage Replica"
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. Azure Backup</b> is correct.<br><br><b>เหตุผล:</b> โจทย์ต้องการให้ก๊อปปี้ข้อมูลที่มี **ไฟล์ที่กำลังถูกใช้งานอยู่ (in-use files)** การใช้คำสั่งก๊อปปี้ธรรมดาจะพังทันที แต่ <b>Azure Backup</b> จะใช้ฟีเจอร์ VSS (Volume Shadow Copy Service) ในการทำ Snapshot ซึ่งสามารถดูดไฟล์ที่กำลังถูกเปิดใช้งานไปแบ็คอัพได้อย่างปลอดภัย จากนั้นเราก็แค่เอาข้อมูลนั้นไปสั่ง Restore ลงบน Server2 ใน Azure ได้เลยครับ (Storage Migration Service ไม่รองรับเป้าหมายปลายทางที่เป็น Workgroup ครับ)"
+            },
+            // ==========================================
+            // Question 12 (Topic 4 - Sysvol FRS to DFSR - Series 1)
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario.<br><br>" +
+                          "Your network contains a single-domain Active Directory Domain Services (AD DS) forest named contoso.com.<br>" +
+                          "The functional level of the forest is Windows Server 2012 R2. All domain controllers run Windows Server 2012 R2.<br>" +
+                          "Sysvol replicates by using the File Replication Service (FRS).<br>" +
+                          "You plan to replace the existing domain controllers with new domain controllers that will run Windows Server 2022.<br><br>" +
+                          "You need to ensure that you can add the first domain controller that runs Windows Server 2022.<br><br>" +
+                          "<b>Solution:</b> You migrate sysvol from FRS to Distributed File System (DFS) Replication.<br><br>" +
+                          "Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 0, // A
+                explanation: "✅ <b>Explanation:</b><br><b>A. Yes</b> is correct.<br><br><b>เหตุผล:</b> กฎเหล็กของ <b>Windows Server 2022 (และ 2019) คือ 'มันไม่รองรับ FRS (File Replication Service) อีกต่อไปแล้ว!'</b> ดังนั้น หากระบบเดิมของคุณ (2012 R2) ยังคงใช้ระบบซิงค์ SYSVOL แบบโบราณอย่าง FRS อยู่ คุณจะไม่มีทางโปรโมท (Add) เครื่อง 2022 ขึ้นมาเป็น DC ได้เลย คุณต้องทำการ Migrate ระบบซิงค์จาก FRS ให้กลายเป็น <b>DFS Replication (DFSR)</b> ให้เรียบร้อยเสียก่อนครับ โซลูชันนี้จึงถูกต้องและตอบโจทย์ที่สุดครับ<br><b>ตั้งแต่ Windows Server 2016 เป็นต้นมา (รวมถึง 2019 และ 2022) Microsoft ได้ ถอดถอนและยกเลิกการรองรับ(Deprecated and Removed) ระบบ FRS อย่างถาวร</b>"
+            },
+            // ==========================================
+            // Question 13 (Topic 4 - Sysvol FRS to DFSR - Series 2)
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario.<br><br>" +
+                          "Your network contains a single-domain Active Directory Domain Services (AD DS) forest named contoso.com.<br>" +
+                          "The functional level of the forest is Windows Server 2012 R2. All domain controllers run Windows Server 2012 R2.<br>" +
+                          "Sysvol replicates by using the File Replication Service (FRS).<br>" +
+                          "You plan to replace the existing domain controllers with new domain controllers that will run Windows Server 2022.<br><br>" +
+                          "You need to ensure that you can add the first domain controller that runs Windows Server 2022.<br><br>" +
+                          "<b>Solution:</b> You upgrade the PDC emulator.<br><br>" +
+                          "Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. No</b> is correct.<br><br><b>เหตุผล:</b> (ต่อเนื่องจากข้อ 12) การอัปเกรด PDC Emulator ไม่ได้ช่วยแก้ปัญหาคอขวดที่ระบบยังใช้ FRS อยู่ครับ ต้องแก้ที่กระบวนการทำ DFSR Migration ก่อนเท่านั้น"
+            },
+            // ==========================================
+            // Question 14 (Topic 4 - Sysvol FRS to DFSR - Series 3)
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario.<br><br>" +
+                          "Your network contains a single-domain Active Directory Domain Services (AD DS) forest named contoso.com.<br>" +
+                          "The functional level of the forest is Windows Server 2012 R2. All domain controllers run Windows Server 2012 R2.<br>" +
+                          "Sysvol replicates by using the File Replication Service (FRS).<br>" +
+                          "You plan to replace the existing domain controllers with new domain controllers that will run Windows Server 2022.<br><br>" +
+                          "You need to ensure that you can add the first domain controller that runs Windows Server 2022.<br><br>" +
+                          "<b>Solution:</b> You run the Active Directory Migration Tool (ADMT).<br><br>" +
+                          "Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. No</b> is correct.<br><br><b>เหตุผล:</b> ADMT มีไว้สำหรับโยกย้าย User/Computer ข้ามโดเมน ไม่ได้มีหน้าที่เกี่ยวกับการอัปเกรดระบบซิงค์ไฟล์ (FRS) ครับ"
+            },
+            // ==========================================
+            // Question 15 (Topic 4 - Azure Data Box)
+            // ==========================================
+            {
+                question: "Your on-premises network has 200-Mbps connection to Azure and contains a server named Server1 that stores 70 TB of data files.<br>" +
+                          "You have an Azure Storage account named storage1.<br>" +
+                          "You plan to migrate the data files from Server1 to a blob storage container in storage1.<br>" +
+                          "Testing shows that copying the data files by using azcopy will take approximately 35 days.<br><br>" +
+                          "You need to minimize how long it will take to migrate the data to Azure.<br><br>" +
+                          "What should you use?",
+                options: [
+                    "A. Azure Storage Explorer",
+                    "B. Azure Data Box",
+                    "C. Storage Migration Service",
+                    "D. Azure File Sync"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. Azure Data Box</b> is correct.<br><br><b>เหตุผล:</b> เมื่อคุณมีข้อมูลขนาดมหาศาล (เช่น 70 TB) และอินเทอร์เน็ตมีจำกัด (ต้องใช้เวลาอัปโหลดเป็นเดือนๆ) ทางเลือกที่ดีที่สุดที่ Microsoft แนะนำคือการสั่ง <b>Azure Data Box</b> (กล่องฮาร์ดดิสก์ของ Microsoft) ให้ส่งมาที่ Data Center ของคุณ คุณก็แค่เสียบสายก๊อปปี้ข้อมูลลงกล่องด้วยสปีดของสายแลนภายใน แล้วส่งพัสดุไปรษณีย์กลับไปให้ Microsoft เอาไปเสียบเข้า Data Center ให้ครับ! (เร็วกว่าการอัปโหลดผ่านเน็ตแน่นอน)"
+            },
+            // ==========================================
+            // Question 16 (Topic 4 - Azure Migrate CSV Format)
+            // ==========================================
+            {
+                question: "You need to use a comma-separated value (CSV) file to import server inventory to Azure Migrate.<br><br>" +
+                          "Which fields are mandatory for each entry in the CSV file?",
+                options: [
+                    "A. Server name, IP addresses, OS version, and Number of disks",
+                    "B. Server name, Cores, OS Name, and Memory (in MB)",
+                    "C. Server name, IP addresses, Disk 1 size (in GB), and CPU utilization percentage"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. Server name, Cores, OS Name, and Memory (in MB)</b> is correct.<br><br><b>เหตุผล:</b> หากคุณใช้วิธี Import ข้อมูลเครื่อง (เพื่อทำ Assessment ประเมินราคาการย้ายขึ้นคลาวด์) แบบไม่ต้องลง Agent โดยการส่งเป็นไฟล์ Excel/CSV คอลัมน์บังคับ (Mandatory fields) ที่ Azure Migrate ต้องการเพื่อคำนวณสเปคและราคา คือ <b>ชื่อเซิร์ฟเวอร์, จำนวน Core CPU, ชื่อ OS, และจำนวน RAM (ในหน่วย MB)</b> ครับ"
+            },
+            // ==========================================
+            // Question 17 (Topic 4 - Sysvol FRS to DFSR - Series 4)
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario.<br><br>" +
+                          "Your network contains a single-domain Active Directory Domain Services (AD DS) forest named contoso.com.<br>" +
+                          "The functional level of the forest is Windows Server 2012 R2. All domain controllers run Windows Server 2012 R2.<br>" +
+                          "Sysvol replicates by using the File Replication Service (FRS).<br>" +
+                          "You plan to replace the existing domain controllers with new domain controllers that will run Windows Server 2022.<br><br>" +
+                          "You need to ensure that you can add the first domain controller that runs Windows Server 2022.<br><br>" +
+                          "<b>Solution:</b> You raise the domain and forest functional levels.<br><br>" +
+                          "Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. No</b> is correct.<br><br><b>เหตุผล:</b> (ยังคงอยู่ในซีรีส์เดิมครับ) การไปยกระดับ Functional Levels ตอนนี้ทำไม่ได้ด้วยซ้ำ เพราะเครื่องยังเป็น 2012 R2 อยู่ และต่อให้ยกได้ ก็ไม่ได้แก้ปัญหาที่ยังติด FRS อยู่ดีครับ"
+            },
+            // ==========================================
+            // Question 18 (Topic 4 - Storage Migration Service Extension)
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have the servers shown in the following table.<br><br>" +
+                          "<table class='info-table'><tr><th>Name</th><th>Operating system</th><th>Configuration</th><th>Install option</th></tr>" +
+                          "<tr><td>Server1</td><td>Windows Server 2012 R2</td><td>File server</td><td>Server Core</td></tr>" +
+                          "<tr><td>Server2</td><td>Windows Server 2022</td><td>File server</td><td>Server Core</td></tr>" +
+                          "<tr><td>Server3</td><td>Windows Server 2016</td><td>Domain controller</td><td>Server with Desktop Experience</td></tr></table><br>" +
+                          "You plan to migrate file shares from Server1 to Server2.<br>" +
+                          "You need to deploy the Storage Migration Service and the Storage Migration Service extension.<br><br>" +
+                          "On which server should you install each component? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q18-dd1", 
+                        label: "Storage Migration Service:", 
+                        options: ["Server1", "Server2", "Server3"], 
+                        correctAnswer: "Server2" 
+                    },
+                    { 
+                        id: "q18-dd2", 
+                        label: "Storage Migration Service extension:", 
+                        options: ["Server1", "Server2", "Server3"], 
+                        correctAnswer: "Server3" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "<b>1. Storage Migration Service: Server2</b><br>บทบาท (Role) ของ <b>Storage Migration Service (Orchestrator)</b> คือตัวสั่งการเพื่อคุมการย้ายไฟล์ โดยข้อจำกัดของมันคือ <b>จะต้องถูกติดตั้งอยู่บนเครื่อง Windows Server 2019 หรือ 2022 เท่านั้น</b> (Server1 เป็น 2012 จึงหมดสิทธิ์, Server3 เป็น 2016 ก็หมดสิทธิ์) ตัวเลือกเดียวที่ลงได้คือเครื่องปลายทาง <b>Server2</b> ครับ<br><br>" +
+                             "<b>2. Storage Migration Service extension: Server3</b><br>ตัว 'Extension' ในที่นี้หมายถึง <b>ปลั๊กอินหน้าต่างกราฟิก (GUI) ของ Windows Admin Center (WAC)</b> ครับ! เนื่องจาก Server1 และ Server2 เป็น Server Core (ไม่มีหน้าจอ) การจะเรียกเปิด WAC เพื่อคลิกสั่งงานได้ จะต้องติดตั้ง WAC และโหลด Extension นี้ลงบน <b>Server3</b> (ที่มี Desktop Experience) ครับ แล้วค่อยรีโมทไปสั่ง Server2 อีกที"
+            },
+            // ==========================================
+            // Question 19 (Topic 4 - Azure Migrate NIC Teaming - Series 1)
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario.<br><br>" +
+                          "You deploy Azure Migrate to an on-premises network.<br>" +
+                          "You have an on-premises physical server named Server1 that runs Windows Server and has the following configurations:<br>" +
+                          "• Operating system disk: 600 GB<br>" +
+                          "• Data disk: 3 TB<br>" +
+                          "• NIC Teaming: Enabled<br>" +
+                          "• Mobility service: Installed<br>" +
+                          "• Windows Defender Firewall: Enabled<br>" +
+                          "• Microsoft Defender Antivirus: Enabled<br><br>" +
+                          "You need to ensure that you can use Azure Migrate to migrate Server1.<br><br>" +
+                          "<b>Solution:</b> You disable Windows Defender Firewall on Server1.<br><br>" +
+                          "Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. No</b> is correct.<br><br><b>เหตุผล:</b> ในการอพยพเครื่อง (Migrate) ไปยัง Azure, ฟีเจอร์ที่เข้ากันไม่ได้กับคลาวด์เด็ดขาดเลยก็คือ <b>NIC Teaming (การมัดรวมพอร์ตสายแลน)</b> ครับ เนื่องจากโครงสร้างเน็ตเวิร์กของ Azure ไม่รองรับการทำ NIC Teaming ระดับ OS ดังนั้นหากไม่ยกเลิก (Break) NIC Teaming ทิ้งไปก่อน คุณจะไม่สามารถย้ายเครื่องนี้ไปรันบน Azure ได้ครับ (การปิด Firewall ไม่เกี่ยวกับการบล็อกจุดนี้)"
+            },
+            // ==========================================
+            // Question 20 (Topic 4 - Azure Migrate NIC Teaming - Series 2)
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario.<br><br>" +
+                          "You deploy Azure Migrate to an on-premises network.<br>" +
+                          "You have an on-premises physical server named Server1 that runs Windows Server and has the following configurations:<br>" +
+                          "• Operating system disk: 600 GB<br>" +
+                          "• Data disk: 3 TB<br>" +
+                          "• NIC Teaming: Enabled<br>" +
+                          "• Mobility service: Installed<br>" +
+                          "• Windows Defender Firewall: Enabled<br>" +
+                          "• Microsoft Defender Antivirus: Enabled<br><br>" +
+                          "You need to ensure that you can use Azure Migrate to migrate Server1.<br><br>" +
+                          "<b>Solution:</b> You shrink the data disk on Server1.<br><br>" +
+                          "Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. No</b> is correct.<br><br><b>เหตุผล:</b> (ยังคงอยู่ในซีรีส์ปัญหาเดียวกัน) การไปหดขนาด Data disk (Shrink disk) ไม่ได้ช่วยแก้ปัญหาหลักที่เกิดจาก <b>NIC Teaming</b> ครับ Azure รองรับดิสก์ขนาด 3TB ได้สบายๆ ปัญหาเดียวที่ขัดขวางการย้ายเครื่องตอนนี้คือ NIC Teaming เท่านั้นครับ"
+            },
+            // ==========================================
+            // Question 21 (Topic 4 - Azure Migrate NIC Teaming 1)
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario.<br><br>" +
+                          "You deploy Azure Migrate to an on-premises network.<br>" +
+                          "You have an on-premises physical server named Server1 that runs Windows Server and has the following configurations:<br>" +
+                          "• Operating system disk: 600 GB<br>" +
+                          "• Data disk: 3 TB<br>" +
+                          "• NIC Teaming: Enabled<br>" +
+                          "• Mobility service: Installed<br>" +
+                          "• Windows Defender Firewall: Enabled<br>" +
+                          "• Microsoft Defender Antivirus: Enabled<br><br>" +
+                          "You need to ensure that you can use Azure Migrate to migrate Server1.<br><br>" +
+                          "<b>Solution:</b> You disable NIC Teaming on Server1.<br><br>" +
+                          "Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 0, // A
+                explanation: "✅ <b>Explanation:</b><br><b>A. Yes</b> is correct.<br><br><b>เหตุผล:</b> สถาปัตยกรรมของ Azure ไม่รองรับการทำ <b>NIC Teaming (การมัดรวมพอร์ตแลน)</b> ระดับ OS ครับ ดังนั้นหากเครื่อง On-premises ของคุณเปิด NIC Teaming ไว้ คุณจะต้องทำการยกเลิก (Disable/Break) มันทิ้งเสียก่อน จึงจะสามารถ Migrate เครื่องขึ้น Azure ได้สำเร็จครับ โซลูชันนี้จึงแก้ปัญหาได้ตรงจุดพอดี"
+            },
+            // ==========================================
+            // Question 22 (Topic 4 - Azure Migrate NIC Teaming 2)
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario.<br><br>" +
+                          "You deploy Azure Migrate to an on-premises network.<br>" +
+                          "You have an on-premises physical server named Server1 that runs Windows Server and has the following configurations:<br>" +
+                          "• Operating system disk: 600 GB<br>" +
+                          "• Data disk: 3 TB<br>" +
+                          "• NIC Teaming: Enabled<br>" +
+                          "• Mobility service: Installed<br>" +
+                          "• Windows Defender Firewall: Enabled<br>" +
+                          "• Microsoft Defender Antivirus: Enabled<br><br>" +
+                          "You need to ensure that you can use Azure Migrate to migrate Server1.<br><br>" +
+                          "<b>Solution:</b> You disable Microsoft Defender Antivirus on Server1.<br><br>" +
+                          "Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. No</b> is correct.<br><br><b>เหตุผล:</b> (ยังคงเป็นปัญหาต่อเนื่องจากข้อ 21) การปิด Antivirus ไม่ได้ช่วยแก้ปัญหาคอขวดที่ระบบติด NIC Teaming อยู่ครับ"
+            },
+            // ==========================================
+            // Question 23 (Topic 4 - App Containerization Tools)
+            // ==========================================
+            {
+                type: "dragdrop",
+                question: "DRAG DROP - <br>You have an on-premises IIS web server that hosts a web app named App1.<br>" +
+                          "You plan to migrate App1 to a container and run the container in Azure.<br>" +
+                          "You need to perform the following tasks:<br>" +
+                          "• Export App1 to a ZIP file.<br>" +
+                          "• Create a container image based on App1.<br><br>" +
+                          "The solution must minimize administrative effort.<br>" +
+                          "Which tool should you use for each task? To answer, drag the appropriate tools to the correct tasks.",
+                draggables: [
+                    "Azure Migrate",
+                    "The Azure portal",
+                    "Web Deploy",
+                    "Windows Admin Center",
+                    "Windows Server Migration Tools"
+                ],
+                targets: [
+                    { 
+                        label: "Export App1 to a ZIP file:", 
+                        expected: ["Web Deploy"] 
+                    },
+                    { 
+                        label: "Create a container image with App1:", 
+                        expected: ["Azure Migrate"] 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "<b>1. Export App1: Web Deploy</b><br>ในการจะดูดไฟล์และคอนฟิกของเว็บแอปพลิเคชันจาก IIS ออกมาเป็นแพ็กเกจ (ZIP) อย่างสมบูรณ์ ต้องใช้เครื่องมือที่ชื่อว่า <b>Web Deploy</b> ครับ<br><br>" +
+                             "<b>2. Create a container image: Azure Migrate</b><br>หลังจากได้แพ็กเกจมาแล้ว เราสามารถใช้เครื่องมือ <b>Azure Migrate: App Containerization</b> เพื่อแปลงแอปของเราให้กลายเป็น Docker Container Image และอัปโหลดขึ้นคลาวด์ให้อัตโนมัติครับ"
+            },
+            // ==========================================
+            // Question 24 (Topic 4 - S2D Disk Space & Cache Matrix)
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have a failover cluster named Cluster1 that contains four Windows Server nodes named Node1, Node2, Node3, and Node4.<br>" +
+                          "You need to deploy a Storage Spaces Direct virtual disk to Cluster1.<br>" +
+                          "You add the following disks to each node:<br>" +
+                          "• Three 512-GB NVMe disks<br>" +
+                          "• Three 3-TB HDD disks<br>" +
+                          "• Three 1-TB SSD disks<br><br>" +
+                          "On Cluster1, you enable Storage Spaces Direct and add the new disks.<br>" +
+                          "What is the total amount of disk space available for the Storage Spaces Direct virtual disk, and which operations are cached for the SSD and HDD disks?<br>" +
+                          "To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q24-dd1", 
+                        label: "Disk space available for the Storage Spaces Direct virtual disk:", 
+                        options: ["16 TB", "36 TB", "40.5 TB", "48 TB", "53.5 TB"], 
+                        correctAnswer: "48 TB" 
+                    },
+                    { 
+                        id: "q24-dd2", 
+                        label: "Cache behavior of the SSD disks:", 
+                        options: ["Neither read nor write operations are cached.", "Only read operations are cached.", "Only write operations are cached.", "Read and write operations are cached."], 
+                        correctAnswer: "Only write operations are cached." 
+                    },
+                    { 
+                        id: "q24-dd3", 
+                        label: "Cache behavior of the HDD disks:", 
+                        options: ["Neither read nor write operations are cached.", "Only read operations are cached.", "Only write operations are cached.", "Read and write operations are cached."], 
+                        correctAnswer: "Read and write operations are cached." 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "<b>1. Disk Space (48 TB):</b><br>ใน S2D ดิสก์ที่เร็วที่สุด (NVMe) จะถูกยึดไปทำ Cache ทั้งหมด พื้นที่สำหรับเก็บข้อมูล (Capacity) จึงเหลือแค่ SSD และ HDD<br>1 โหนด = (3 x 1TB SSD) + (3 x 3TB HDD) = 12 TB<br>4 โหนด = 12 TB x 4 = <b>48 TB</b> (Raw capacity)<br><br>" +
+                             "<b>2. SSD Cache (Write Only):</b> เมื่อ SSD ทำงานคู่กับ Cache ที่เร็วกว่า (NVMe) มันจะแคชเฉพาะการเขียนข้อมูล (Write operations) เท่านั้น เพราะการอ่านจาก SSD ตรงๆ ก็เร็วพออยู่แล้ว<br><br>" +
+                             "<b>3. HDD Cache (Read and Write):</b> เมื่อ HDD (ซึ่งช้ามาก) ทำงานคู่กับ Cache (NVMe) ระบบจะแคชทั้งการอ่านและเขียน (Read and write) เพื่อช่วยเร่งสปีดให้ HDD ครับ"
+            },
+            // ==========================================
+            // Question 25 (Topic 4 - Azure Migrate Task Assignment)
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your on-premises datacenter contains physical servers and Hyper-V virtual machines.<br>" +
+                          "You have an Azure subscription.<br>" +
+                          "You plan to use Azure Migrate to perform the following tasks:<br>" +
+                          "• Migrate the physical servers to Azure virtual machines.<br>" +
+                          "• Migrate the Hyper-V virtual machines to Azure.<br><br>" +
+                          "What should you use for each task? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q25-dd1", 
+                        label: "Migrate the physical servers to Azure virtual machines:", 
+                        options: ["Azure Data Box", "Data Migration Assistant", "Migration and modernization", "Movere"], 
+                        correctAnswer: "Migration and modernization" 
+                    },
+                    { 
+                        id: "q25-dd2", 
+                        label: "Migrate the Hyper-V virtual machines to Azure:", 
+                        options: ["Azure Data Box", "Data Migration Assistant", "Migration and modernization", "Movere"], 
+                        correctAnswer: "Migration and modernization" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>ทั้งการย้าย <b>Physical Servers</b> และการย้าย <b>Hyper-V/VMware VMs</b> ขึ้นไปยัง Azure ปัจจุบันนี้เครื่องมือศูนย์กลางเพียงตัวเดียวที่ครอบคลุมงานทั้งหมดนี้คือ <b>Migration and modernization</b> (หรือชื่อเดิมคือ Azure Migrate: Server Migration) ครับ!"
+            },
+            // ==========================================
+            // Question 26 (Topic 4 - Azure File Sync Setup)
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have an on-premises server that runs Windows Server and contains a folder named Folder1.<br>" +
+                          "Folder1 contains 50 GB of files.<br>" +
+                          "You have an Azure subscription that contains an Azure Files share named share.<br>" +
+                          "You need to migrate the data in Folder1 to share.<br><br>" +
+                          "What should you do? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q26-dd1", 
+                        label: "Deploy to Azure:", 
+                        options: ["ArcBox", "A Storage Sync Service instance", "An Azure Migrate project", "An Azure Storage account", "An on-premises data gateway"], 
+                        correctAnswer: "A Storage Sync Service instance" 
+                    },
+                    { 
+                        id: "q26-dd2", 
+                        label: "Install on Server1:", 
+                        options: ["The Azure File Sync agent", "The Azure Connected Machine agent", "Storage Migration Service feature", "Storage Replica feature"], 
+                        correctAnswer: "The Azure File Sync agent" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "<b>1. Deploy to Azure: A Storage Sync Service instance</b><br>เพื่อให้คลาวด์รอรับการซิงค์ไฟล์จากเซิร์ฟเวอร์ On-prem คุณจะต้องสร้างเซอร์วิสที่ชื่อว่า <b>Storage Sync Service</b> ไว้บน Azure ก่อน<br><br>" +
+                             "<b>2. Install on Server1: The Azure File Sync agent</b><br>บนเครื่องเซิร์ฟเวอร์ของคุณ จะต้องไปดาวน์โหลดและติดตั้ง <b>Azure File Sync Agent</b> เพื่อให้มันคอยดักจับและอัปโหลดไฟล์ใน Folder1 ขึ้นไปบน Azure Files Share ให้แบบอัตโนมัติครับ"
+            },
+            // ==========================================
+            // Question 27 (Topic 4 - App Containerization Pre-req Web Deploy)
+            // ==========================================
+            {
+                question: "You have an on-premises server named Server1 that runs Windows Server.<br>" +
+                          "Server1 has the Web Server (IIS) server role installed and hosts an ASP.NET web app named App1.<br>" +
+                          "You have an Azure subscription.<br>" +
+                          "You plan to migrate App1 to a container in Azure.<br>" +
+                          "You need to export App1 to a ZIP file.<br><br>" +
+                          "What should you install on Server1?",
+                options: [
+                    "A. the Windows Server Migration Tools feature",
+                    "B. the IIS Management Scripts and Tools role service",
+                    "C. Web Deploy",
+                    "D. Docker Enterprise"
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. Web Deploy</b> is correct.<br><br><b>เหตุผล:</b> (คล้ายกับข้อ 23) เครื่องมือที่จะช่วย Extract เว็บแอปพลิเคชันของคุณที่อยู่บน IIS ให้ออกมาเป็นไฟล์แพ็กเกจ (ZIP) อย่างปลอดภัยเพื่อเตรียมนำไปทำ Container ก็คือ <b>Web Deploy</b> ครับ"
+            },
+            // ==========================================
+            // Question 28 (Topic 4 - Azure Migrate Initial Discovery)
+            // ==========================================
+            {
+                question: "You have an on-premises Hyper-V deployment that hosts multiple virtual machines.<br>" +
+                          "You have an Azure subscription that contains an Azure Migrate project named Project1.<br>" +
+                          "You plan to migrate the virtual machines to Azure by using Project1.<br>" +
+                          "You need to discover all the Hyper-V hosts and virtual machines running in your environment.<br>" +
+                          "The solution must minimize administrative effort.<br><br>" +
+                          "What should you do first?",
+                options: [
+                    "A. Register an appliance.",
+                    "B. Create a private endpoint.",
+                    "C. Generate a project key.",
+                    "D. Deploy an Azure Network Adapter."
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. Generate a project key.</b> is correct.<br><br>พอโจทย์บอกว่าไม่อยากเหนื่อย (Minimize administrative effort) แอดมินจึงต้องเลือกใช้วิธีเอาเซิร์ฟเวอร์ตัวกลางที่เรียกว่า Appliance มาตั้งไว้ตรงกลางเพื่อให้มันช่วยสแกนรวบยอดให้ทีเดียว (Agentless)และกระบวนการที่จะเอา Appliance มาใช้งานได้ สเต็ปแรกสุดที่บังคับให้ทำ ก็คือการไปกดสร้าง <b>Generate a project key</b> บนหน้าเว็บ Azure เพื่อเอากุญแจนี้ไปใช้ยืนยันตัวตนในขั้นตอนต่อๆ ไป<br><b>เหตุผล:</b> ในการเริ่มต้นใช้งาน Azure Migrate คุณจะต้องใช้ Appliance (VM ตัวนึงที่ตั้งใน On-prem เพื่อไปสแกนหาเครื่อง) แต่ก่อนที่คุณจะ Register Appliance ตัวนั้นได้ สิ่ง<b>แรกสุด</b>ที่คุณต้องทำใน Azure Portal คือการกด <b>Generate a project key</b> ขึ้นมาก่อน เพื่อเอารหัสนี้ไปป้อนใส่ตอนตั้งค่า Appliance ให้มันลิงก์กันครับ"
+            },
+            // ==========================================
+            // Question 29 (Topic 4 - App Containerization Remoting & Web Deploy)
+            // ==========================================
+            {
+                type: "multiple_select",
+                question: "You have an on-premises server named Server1 that runs Windows Server 2016 and has IIS enabled.<br>" +
+                          "Server1 contains an ASP.NET 3.5 app named App1<br>" +
+                          "You have an Azure subscription.<br>" +
+                          "You need to use the Azure Migrate App Containerization tool to migrate App1 to Azure App Service.<br>" +
+                          "The solution must minimize administrative effort.<br><br>" +
+                          "Which two actions should you perform on Server1 before you use the Azure Migrate App Containerization tool?<br>Each correct answer presents part of the solution.",
+                options: [
+                    "A. Install the Web Deploy tool.",
+                    "B. Install NET Framework 4.8.",
+                    "C. Enable remote administration for IIS.",
+                    "D. Enable PowerShell remoting."
+                ],
+                correctAnswerIndex: [0, 3], // A, D
+                explanation: "✅ <b>Explanation:</b><br><b>A. Install the Web Deploy tool.</b> and <b>D. Enable PowerShell remoting.</b> are correct.<br><br>เครื่องมือ App Containerization ถูกสร้างมาเพื่ออำนวยความสะดวกในการแพ็คแอปพลิเคชันเก่าๆ ลงContainer(Docker)แบบอัตโนมัติ โดยเครื่องมือนี้มักจะติดตั้งอยู่บนเครื่องจัดการต่างหาก (Helper Machine)เพื่อให้เครื่องมือนี้สามารถเชื่อมต่อเข้าไปสแกนและดึงข้อมูลแอปพลิเคชันออกมาจาก Server1 (เครื่องต้นทาง) ได้สำเร็จ Microsoft จึงบังคับเงื่อนไข 2 ข้อนี้บนเครื่องต้นทาง<br><b>เหตุผล:</b> เพื่อให้เครื่องมือ Azure Migrate App Containerization สามารถดึงข้อมูลแอปพลิเคชันของคุณไปทำคอนเทนเนอร์ได้อย่างสมบูรณ์แบบ มันต้องการ: <br>1. <b>PowerShell remoting</b> (เพื่อส่งสคริปต์คำสั่งมาคุมเซิร์ฟเวอร์คุณจากระยะไกลได้) <br>2. <b>Web Deploy</b> (เป็นเครื่องมือหลักในการดูดไฟล์แอปออกจาก IIS) ครับ"
+            },
+            // ==========================================
+            // Question 30 (Topic 4 - Print Migration Unsupported Ports)
+            // ==========================================
+            {
+                question: "Your network contains an Active Directory Domain Services (AD DS) domain.<br>" +
+                          "The domain contains the servers shown in the following table.<br>" +
+                          "<table class='info-table'><tr><th>Name</th><th>Operating system</th></tr>" +
+                          "<tr><td>Server1</td><td>Windows Server 2019</td></tr>" +
+                          "<tr><td>Server2</td><td>Windows Server 2022</td></tr></table><br>" +
+                          "Server1 contains the printers shown in the following table.<br>" +
+                          "<table class='info-table'><tr><th>Name</th><th>Connected to</th></tr>" +
+                          "<tr><td>Printer1</td><td>A printer port named LPT1</td></tr>" +
+                          "<tr><td>Printer2</td><td>A local port named Port1</td></tr>" +
+                          "<tr><td>Printer3</td><td>A standard TCP/IP port of 192.168.10.15</td></tr>" +
+                          "<tr><td>Printer4</td><td>Prints to a file</td></tr></table><br>" +
+                          "You plan to use Print Management to migrate the printers to Server2.<br><br>" +
+                          "Which printers can be migrated and retain their current configuration?",
+                options: [
+                    "A. Printer3 only",
+                    "B. Printer3 and Printer4 only",
+                    "C. Printer1, Printer3, and Printer4",
+                    "D. Printer2, Printer3, and Printer", // Note: The dump has a typo here ("Printer") but we keep it
+                    "E. Printer1, Printer2, Printer3, and Printer4"
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. Printer1, Printer3, and Printer4</b> is correct.<br><br><b>เหตุผล:</b> เครื่องมือ Print Migration ของ Windows จะรองรับการย้ายปริ้นเตอร์ที่เชื่อมต่อผ่าน <b>Standard Ports</b> เท่านั้น (เช่น พอร์ต LPT, COM, FILE, หรือ Standard TCP/IP) <br>แต่สำหรับ Printer2 ที่ถูกสร้างเป็น <b>Custom local port ที่ไม่ได้มาตรฐาน (ตั้งชื่อเองว่า 'Port1')</b> มันจะไม่สามารถย้ายอัตโนมัติได้และจะพังระหว่างทางครับ ดังนั้นตัวที่รอดคือ 1, 3, 4 ครับ"
+            }
+
+        ];
+
+        // ==========================================
+        // 🚨 ตั้งค่าเลขข้อเริ่มต้นของไฟล์นี้
+        // ==========================================
+        const STARTING_QUESTION_NUMBER = 1; 
+
+        let currentQuestion = 0; 
+        let score = 0; 
+        let questionStates = []; 
+
+        // คำนวณ Topic และเลขข้อ
+        function getQuestionInfo(globalIndex) {
+            if(quizData.length === 0) return { topicName: "Topic", questionNumber: STARTING_QUESTION_NUMBER };
+            
+            let firstTopicOfFile = quizData[0].topic || "Topic 2"; 
+            let topic = firstTopicOfFile; 
+            let localNum = STARTING_QUESTION_NUMBER; 
+
+            for (let i = 1; i <= globalIndex; i++) {
+                if (quizData[i].topic && quizData[i].topic !== topic) {
+                    topic = quizData[i].topic; 
+                    localNum = 1;              
+                } else {
+                    localNum++;                
+                }
+            }
+            return { topicName: topic, questionNumber: localNum };
+        }
+
+        // วาดแผงปุ่มด้านบน
+        function drawNavigationGrid() {
+            const navGrid = document.getElementById('navigation-grid');
+            navGrid.innerHTML = '';
+            
+            let currentTopicName = "";
+            let currentTopicGroup = null;
+            let localNum = 1;
+            const firstTopicOfFile = quizData[0].topic || "Topic 1";
+
+            quizData.forEach((q, index) => {
+                let thisTopic = q.topic ? q.topic : currentTopicName;
+                if (!thisTopic) thisTopic = "Topic 1"; 
+
+                if (thisTopic !== currentTopicName) {
+                    currentTopicName = thisTopic;
+                    
+                    if (currentTopicName === firstTopicOfFile) {
+                        localNum = STARTING_QUESTION_NUMBER;
+                    } else {
+                        localNum = 1;
+                    }
+                    
+                    const topicHeader = document.createElement('div');
+                    topicHeader.style.width = '100%';
+                    topicHeader.style.fontWeight = 'bold';
+                    topicHeader.style.marginTop = index === 0 ? '0px' : '15px';
+                    topicHeader.style.marginBottom = '8px';
+                    topicHeader.style.color = '#0078d4';
+                    topicHeader.style.borderBottom = '1px solid #ccc';
+                    topicHeader.innerText = currentTopicName;
+                    navGrid.appendChild(topicHeader);
+                    
+                    currentTopicGroup = document.createElement('div');
+                    currentTopicGroup.style.display = 'flex';
+                    currentTopicGroup.style.flexWrap = 'wrap';
+                    currentTopicGroup.style.gap = '8px';
+                    currentTopicGroup.style.width = '100%';
+                    navGrid.appendChild(currentTopicGroup);
+                }
+
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.innerText = localNum; 
+                
+                if (index === currentQuestion) btn.classList.add('active');
+                else if (questionStates[index] === true) btn.classList.add('answered-correct');
+                else if (questionStates[index] === false) btn.classList.add('answered-wrong');
+                
+                btn.onclick = () => jumpToQuestion(index);
+                currentTopicGroup.appendChild(btn);
+                
+                localNum++;
+            });
+        }
+
+        function jumpToQuestion(index) {
+            currentQuestion = index;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if(questionStates.length === 0) questionStates = new Array(quizData.length).fill(null);
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('prev-btn').disabled = (currentQuestion === 0); 
+            
+            drawNavigationGrid(); 
+
+            const q = quizData[currentQuestion];
+            const info = getQuestionInfo(currentQuestion);
+            
+            document.getElementById('question-counter').innerText = `${info.topicName} - Question: ${info.questionNumber}`;
+            
+            let topicHtml = `<div style='font-size: 1.1em; color: #d9534f; margin-bottom: 15px; font-weight: bold; padding-bottom: 5px; border-bottom: 2px dashed #ccc;'>📌 ${info.topicName}</div>`;
+            document.getElementById('question-text').innerHTML = `${topicHtml}<div class="question-badge">Question ${info.questionNumber}</div><br>${q.question}`;
+            
+            const mcqContainer = document.getElementById('options-container');
+            const ddContainer = document.getElementById('dragdrop-container');
+            const hsContainer = document.getElementById('hotspot-container');
+            const dropdownContainer = document.getElementById('dropdown-container');
+            
+            mcqContainer.style.display = "none"; ddContainer.style.display = "none"; hsContainer.style.display = "none"; dropdownContainer.style.display = "none";
+
+            if (!q.type || q.type === "mcq" || q.type === "multiple_select") {
+                mcqContainer.style.display = "block"; mcqContainer.innerHTML = '';
+                let inputType = (q.type === "multiple_select") ? "checkbox" : "radio";
+                q.options.forEach((opt, index) => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `<input type="${inputType}" name="option" value="${index}"> <span style="margin-left:10px;">${opt}</span>`;
+                    mcqContainer.appendChild(label);
+                });
+            } 
+            else if (q.type === "dragdrop") {
+                ddContainer.style.display = "flex";
+                const sourceBox = document.getElementById('source-box'); 
+                const targetsWrapper = document.getElementById('targets-wrapper');
+                
+                sourceBox.innerHTML = '<h4>Options</h4>';
+                targetsWrapper.innerHTML = ''; 
+
+                q.draggables.forEach((itemText, index) => {
+                    const div = document.createElement('div'); div.className = 'draggable'; div.id = `drag-${index}`; div.draggable = true; div.ondragstart = drag; div.innerText = itemText; sourceBox.appendChild(div);
+                });
+
+                if (q.targets) {
+                    q.targets.forEach((target, index) => {
+                        targetsWrapper.innerHTML += `<div class="target-area" id="target-box-${index}" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="target-label">${target.label}</div></div>`;
+                    });
+                } else {
+                    targetsWrapper.innerHTML = `<div class="target-area" id="target-box-0" ondrop="drop(event)" ondragover="allowDrop(event)" style="flex:1;"><div class="target-label">Answer Area (Drop here in order)</div></div>`;
+                }
+            }
+            else if (q.type === "hotspot") {
+                hsContainer.style.display = "block";
+                let html = `<table class="hotspot-table"><tr><th>Statements</th><th>Yes</th><th>No</th></tr>`;
+                q.statements.forEach((stmt, index) => {
+                    html += `<tr id="hs-row-${index}">
+                        <td>${stmt.text}</td>
+                        <td onclick="document.getElementById('yes-${index}').checked = true;"><input type="radio" id="yes-${index}" name="hs-${index}" value="Yes"></td>
+                        <td onclick="document.getElementById('no-${index}').checked = true;"><input type="radio" id="no-${index}" name="hs-${index}" value="No"></td>
+                    </tr>`;
+                });
+                html += `</table>`; hsContainer.innerHTML = html;
+            }
+            else if (q.type === "dropdown" || q.type === "inline_dropdown") {
+                dropdownContainer.style.display = "block";
+                let html = '<div class="dd-area" style="text-align:left; overflow-x:auto;"><h3>Answer Area</h3><br>';
+                
+                if (q.type === "inline_dropdown") {
+                    let template = q.inlineTemplate;
+                    q.dropdowns.forEach((dd, index) => {
+                        let selectHtml = `<select id="sel-${index}" class="dd-select" style="width:auto; display:inline-block; margin: 0 5px; font-family:sans-serif; font-size:1em; padding: 5px;"><option value="">-- Select --</option>`;
+                        dd.options.forEach(opt => { selectHtml += `<option value="${opt}">${opt}</option>`; });
+                        selectHtml += `</select>`;
+                        template = template.replace(`[DD${index}]`, selectHtml);
+                    });
+                    html += `<div style="font-family: monospace; font-size: 1.1em; white-space: normal; word-wrap: break-word; padding: 15px; background: white; border: 1px solid #ccc; border-radius: 5px;">${template}</div>`;
+                } else {
+                    q.dropdowns.forEach((dd, index) => {
+                        html += `<div class="dd-row"><div class="dd-label">${dd.label}</div><select id="sel-${index}" class="dd-select"><option value="">-- Select --</option>`;
+                        dd.options.forEach(opt => { html += `<option value="${opt}">${opt}</option>`; });
+                        html += `</select></div>`;
+                    });
+                }
+                html += '</div>'; dropdownContainer.innerHTML = html;
+            }
+
+            if (questionStates[currentQuestion] !== null) {
+                showPastAnswerFeedback();
+            }
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault(); 
+            if(questionStates[currentQuestion] !== null) return;
+            const data = ev.dataTransfer.getData("text"); 
+            const draggedElement = document.getElementById(data);
+            
+            let dropZone = ev.target.closest('.target-area') || ev.target.closest('.dd-box');
+            if (dropZone) dropZone.appendChild(draggedElement);
+        }
+
+        function checkAnswer() {
+            if(questionStates[currentQuestion] !== null) return;
+            const q = quizData[currentQuestion];
+            let isCorrect = false;
+
+            if (!q.type || q.type === "mcq") {
+                const selectedOption = document.querySelector('input[name="option"]:checked');
+                if (!selectedOption) { alert('Please select an answer!'); return; }
+                isCorrect = (parseInt(selectedOption.value) === q.correctAnswerIndex);
+            } 
+            else if (q.type === "multiple_select") {
+                const selectedOptions = document.querySelectorAll('input[name="option"]:checked');
+                if (selectedOptions.length === 0) { alert('Please select your answers!'); return; }
+                const userAnswers = Array.from(selectedOptions).map(opt => parseInt(opt.value)).sort();
+                const correctAnswers = [...q.correctAnswerIndex].sort();
+                isCorrect = JSON.stringify(userAnswers) === JSON.stringify(correctAnswers);
+            }
+            else if (q.type === "dragdrop") {
+                if (q.targets) {
+                    let allCorrect = true;
+                    q.targets.forEach((target, index) => {
+                        const targetBox = document.getElementById(`target-box-${index}`);
+                        const items = Array.from(targetBox.querySelectorAll('.draggable')).map(el => el.innerText.trim());
+                        if (JSON.stringify(items.sort()) !== JSON.stringify(target.expected.sort())) allCorrect = false;
+                    });
+                    isCorrect = allCorrect;
+                } else {
+                    const targetItems = document.getElementById('target-box-0').querySelectorAll('.draggable');
+                    const userAnswers = Array.from(targetItems).map(el => el.innerText.trim());
+                    if (userAnswers.length === 0) { alert('Please drag answers to the area!'); return; }
+                    isCorrect = JSON.stringify(userAnswers) === JSON.stringify(q.correctOrder);
+                }
+            }
+            else if (q.type === "hotspot") {
+                let correctCount = 0; let answeredCount = 0;
+                q.statements.forEach((stmt, index) => {
+                    const selected = document.querySelector(`input[name="hs-${index}"]:checked`);
+                    if (selected) { answeredCount++; if (selected.value === stmt.correctAnswer) correctCount++; }
+                });
+                if (answeredCount < q.statements.length) { alert('Please answer all statements!'); return; }
+                isCorrect = (correctCount === q.statements.length);
+            }
+            else if (q.type === "dropdown" || q.type === "inline_dropdown") {
+                let correctCount = 0; let answeredCount = 0;
+                q.dropdowns.forEach((dd, index) => {
+                    const sel = document.getElementById(`sel-${index}`);
+                    if (sel.value !== "") answeredCount++;
+                    if (sel.value === dd.correctAnswer) correctCount++;
+                });
+                if (answeredCount < q.dropdowns.length) { alert('Please select options for all dropdowns!'); return; }
+                isCorrect = (correctCount === q.dropdowns.length);
+            }
+
+            questionStates[currentQuestion] = isCorrect;
+            if (isCorrect) score++;
+
+            document.getElementById('score-counter').innerText = `Score: ${score}`;
+            showPastAnswerFeedback();
+            drawNavigationGrid(); 
+        }
+
+        function showPastAnswerFeedback() {
+            const q = quizData[currentQuestion];
+            const expBox = document.getElementById('explanation-box');
+            if (questionStates[currentQuestion]) {
+                expBox.className = 'explanation correct-box'; expBox.innerHTML = "<h4>Correct! 🎉</h4>" + q.explanation;
+            } else {
+                expBox.className = 'explanation incorrect-box'; expBox.innerHTML = "<h4>Incorrect / Reviewed</h4>" + q.explanation;
+            }
+            expBox.style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; loadQuestion(); } }
+        function nextQuestion() { 
+            if (currentQuestion < quizData.length - 1) { currentQuestion++; loadQuestion(); } 
+            else { alert(`End of Exam! Total Score: ${score} / ${quizData.length}`); }
+        }
+
+        window.onload = loadQuestion;
+        
+    </script>
+</body>
+</html>

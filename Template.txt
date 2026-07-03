@@ -1,0 +1,409 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Simulator V5 (Part 1: Q1-30)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; max-width: 850px; margin: 0 auto; padding: 20px; line-height: 1.6;}
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .status-bar { display: flex; justify-content: space-between; margin-bottom: 20px; color: #222; font-weight: bold; font-size: 1.2em; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;}
+        .question-badge { background-color: #0078d4; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+        .question { font-size: 1.1em; margin-bottom: 20px;}
+        
+        /* แผงปุ่มกดข้ามข้อ (Navigation Grid) */
+        .nav-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; padding: 10px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; justify-content: center; }
+        .nav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background: white; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95em;}
+        .nav-btn:hover { background: #f0f0f0; border-color: #0078d4; }
+        .nav-btn.active { background: #0078d4; color: white; border-color: #0078d4; box-shadow: 0 2px 5px rgba(0,120,212,0.4); }
+        .nav-btn.answered-correct { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .nav-btn.answered-wrong { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+        /* สไตล์ตารางโจทย์ทั่วไป */
+        .info-table { width: auto; min-width: 50%; max-width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95em; }
+        .info-table th, .info-table td { border: 1px solid #aaa; padding: 8px; }
+        .info-table th { background: #e9ecef; text-align: left; }
+
+        /* ตัวเลือก MCQ (Radio และ Checkbox) */
+        .options label { display: block; padding: 15px; margin: 10px 0; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; cursor: pointer; transition: 0.2s;}
+        .options label:hover { background: #e2e6ea; }
+        input[type="radio"], input[type="checkbox"] { transform: scale(1.2); cursor: pointer; margin-right: 8px;}
+        
+        /* สไตล์ Drag & Drop (รองรับหลายกล่อง) */
+        .dd-wrapper { display: flex; gap: 20px; margin-top: 15px; align-items: flex-start; }
+        .dd-box { flex: 1; padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #fafafa; min-height: 200px; }
+        .dd-box h4 { margin-top: 0; color: #555; text-align: center; margin-bottom: 15px;}
+        .draggable { background: #0078d4; color: white; padding: 12px; margin-bottom: 10px; border-radius: 5px; cursor: grab; text-align: left; font-weight: 500; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        .draggable:active { cursor: grabbing; }
+        
+        /* กล่องเป้าหมายสำหรับลากวาง */
+        .target-container { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .target-area { padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #f0f8ff; min-height: 100px; }
+        .target-label { font-weight: bold; margin-bottom: 10px; color: #333; text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
+
+        /* สไตล์ Hotspot (ตาราง Yes/No) */
+        .hotspot-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        .hotspot-table th, .hotspot-table td { border: 1px solid #ccc; padding: 12px; }
+        .hotspot-table th { background: #0078d4; color: white; text-align: center; font-weight: bold; }
+        .hotspot-table td:first-child { width: 70%; font-weight: 500; }
+        .hotspot-table td:not(:first-child) { text-align: center; width: 15%; background: #f8f9fa; cursor: pointer;}
+
+        /* สไตล์ Dropdown */
+        .dd-area { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin-top: 15px; text-align: left; display: block; width: auto; overflow-x: auto}
+        .dd-row { margin-bottom: 10px; display: flex; align-items: center; flex-wrap: nowrap;}
+        .dd-label { width: 200px; text-align: right; margin-right: 15px; font-weight: bold; }
+        .dd-select { padding: 5px; font-size: 1em; width: auto; max-width: 170px; border: 1px solid #ccc; border-radius: 4px; }
+
+        /* ปุ่มและเฉลย */
+        .button-group { display: flex; justify-content: space-between; margin-top: 25px; }
+        .btn { background: #0078d4; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: bold;}
+        .btn:hover { background: #005a9e; }
+        .btn-secondary { background: #6c757d; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .explanation { margin-top: 25px; padding: 20px; border-radius: 5px; display: none; }
+        .correct-box { background: #d4edda; border-left: 5px solid #28a745; color: #155724; }
+        .incorrect-box { background: #f8d7da; border-left: 5px solid #dc3545; color: #721c24; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="navigation-grid" class="nav-grid"></div>
+
+        <div class="status-bar">
+            <span id="question-counter">Question: 1</span>
+            <span id="score-counter">Score: 0</span>
+        </div>
+        
+        <div id="question-text" class="question">Loading...</div>
+        
+        <div id="options-container" class="options" style="display: none;"></div>
+        
+        <div id="dragdrop-container" class="dd-wrapper" style="display: none;">
+            <div class="dd-box" id="source-box" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h4>Options</h4>
+            </div>
+            <div id="targets-wrapper" class="target-container"></div>
+        </div>
+
+        <div id="hotspot-container" style="display: none;"></div>
+        <div id="dropdown-container" style="display: none;"></div>
+        
+<div class="button-group">
+
+    <div>
+        <button class="btn btn-secondary"
+            onclick="window.location.href='../index.html'">
+            🏠 Main Menu
+        </button>
+
+        <button class="btn btn-secondary"
+            id="prev-btn"
+            onclick="prevQuestion()">
+            &laquo; Back
+        </button>
+    </div>
+
+    <div>
+        <button class="btn" id="submit-btn"
+            onclick="checkAnswer()">
+            Submit Answer
+        </button>
+
+        <button class="btn"
+            id="next-btn"
+            onclick="nextQuestion()"
+            style="display:none;background:#28a745;">
+            Next Question &raquo;
+        </button>
+    </div>
+
+</div>        
+        <div id="explanation-box" class="explanation"></div>
+    </div>
+
+    <script>
+        const quizData = [
+            // ==========================================
+            // Question 1
+            // ==========================================
+            {
+                topic: "Topic 1",
+                question: "You have a server named Server1 that runs Windows Server. You need to ensure that only specific applications can modify the data in protected folders on Server1. <br><br><b>Solution:</b> From Virus & threat protection, you configure Controlled folder access.<br> Does this meet the goal?",
+                options: ["A. Yes", "B. No"],
+                correctAnswerIndex: 0,
+                explanation: "✅ ตอบ A. Yes: Controlled folder access ถูกออกแบบมาเพื่อป้องกัน Ransomware อนุญาตเฉพาะแอปที่ Whitelisted"
+            },
+
+        // ==========================================
+        // 🚨 ตั้งค่าเลขข้อเริ่มต้นของไฟล์นี้ตรงนี้ครับ!
+        // ==========================================
+        const STARTING_QUESTION_NUMBER = 1; 
+
+        let currentQuestion = 0; 
+        let score = 0; 
+        let questionStates = []; 
+
+        function getQuestionInfo(globalIndex) {
+            if(quizData.length === 0) return { topicName: "Topic", questionNumber: STARTING_QUESTION_NUMBER };
+            let firstTopicOfFile = quizData[0].topic || "Topic 1"; 
+            let topic = firstTopicOfFile; 
+            let localNum = STARTING_QUESTION_NUMBER; 
+
+            for (let i = 1; i <= globalIndex; i++) {
+                if (quizData[i].topic && quizData[i].topic !== topic) {
+                    topic = quizData[i].topic; 
+                    localNum = 1;              
+                } else {
+                    localNum++;                
+                }
+            }
+            return { topicName: topic, questionNumber: localNum };
+        }
+
+        function drawNavigationGrid() {
+            const navGrid = document.getElementById('navigation-grid');
+            navGrid.innerHTML = '';
+            let currentTopicName = "";
+            let currentTopicGroup = null;
+            let localNum = 1;
+            const firstTopicOfFile = quizData[0].topic || "Topic 1";
+
+            quizData.forEach((q, index) => {
+                let thisTopic = q.topic ? q.topic : currentTopicName;
+                if (!thisTopic) thisTopic = "Topic 1"; 
+
+                if (thisTopic !== currentTopicName) {
+                    currentTopicName = thisTopic;
+                    
+                    if (currentTopicName === firstTopicOfFile) {
+                        localNum = STARTING_QUESTION_NUMBER;
+                    } else {
+                        localNum = 1;
+                    }
+                    
+                    const topicHeader = document.createElement('div');
+                    topicHeader.style.width = '100%';
+                    topicHeader.style.fontWeight = 'bold';
+                    topicHeader.style.marginTop = index === 0 ? '0px' : '15px';
+                    topicHeader.style.marginBottom = '8px';
+                    topicHeader.style.color = '#0078d4';
+                    topicHeader.style.borderBottom = '1px solid #ccc';
+                    topicHeader.innerText = currentTopicName;
+                    navGrid.appendChild(topicHeader);
+                    
+                    currentTopicGroup = document.createElement('div');
+                    currentTopicGroup.style.display = 'flex';
+                    currentTopicGroup.style.flexWrap = 'wrap';
+                    currentTopicGroup.style.gap = '8px';
+                    currentTopicGroup.style.width = '100%';
+                    navGrid.appendChild(currentTopicGroup);
+                }
+
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.innerText = localNum; 
+                if (index === currentQuestion) btn.classList.add('active');
+                else if (questionStates[index] === true) btn.classList.add('answered-correct');
+                else if (questionStates[index] === false) btn.classList.add('answered-wrong');
+                btn.onclick = () => jumpToQuestion(index);
+                currentTopicGroup.appendChild(btn);
+                localNum++;
+            });
+        }
+
+        function jumpToQuestion(index) {
+            currentQuestion = index;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if(questionStates.length === 0) questionStates = new Array(quizData.length).fill(null);
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('prev-btn').disabled = (currentQuestion === 0); 
+            
+            drawNavigationGrid(); 
+
+            const q = quizData[currentQuestion];
+            const info = getQuestionInfo(currentQuestion);
+            
+            document.getElementById('question-counter').innerText = `${info.topicName} - Question: ${info.questionNumber}`;
+            
+            let topicHtml = `<div style='font-size: 1.1em; color: #d9534f; margin-bottom: 15px; font-weight: bold; padding-bottom: 5px; border-bottom: 2px dashed #ccc;'>📌 ${info.topicName}</div>`;
+            document.getElementById('question-text').innerHTML = `${topicHtml}<div class="question-badge">Question ${info.questionNumber}</div><br>${q.question}`;
+            
+            const mcqContainer = document.getElementById('options-container');
+            const ddContainer = document.getElementById('dragdrop-container');
+            const hsContainer = document.getElementById('hotspot-container');
+            const dropdownContainer = document.getElementById('dropdown-container');
+            
+            mcqContainer.style.display = "none"; ddContainer.style.display = "none"; hsContainer.style.display = "none"; dropdownContainer.style.display = "none";
+
+            if (!q.type || q.type === "mcq" || q.type === "multiple_select") {
+                mcqContainer.style.display = "block"; mcqContainer.innerHTML = '';
+                let inputType = (q.type === "multiple_select") ? "checkbox" : "radio";
+                q.options.forEach((opt, index) => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `<input type="${inputType}" name="option" value="${index}"> <span style="margin-left:10px;">${opt}</span>`;
+                    mcqContainer.appendChild(label);
+                });
+            } 
+            else if (q.type === "dragdrop") {
+                ddContainer.style.display = "flex";
+                const sourceBox = document.getElementById('source-box'); 
+                const targetsWrapper = document.getElementById('targets-wrapper');
+                
+                sourceBox.innerHTML = '<h4>Options</h4>';
+                targetsWrapper.innerHTML = ''; 
+
+                q.draggables.forEach((itemText, index) => {
+                    const div = document.createElement('div'); div.className = 'draggable'; div.id = `drag-${index}`; div.draggable = true; div.ondragstart = drag; div.innerText = itemText; sourceBox.appendChild(div);
+                });
+
+                if (q.targets) {
+                    q.targets.forEach((target, index) => {
+                        targetsWrapper.innerHTML += `<div class="target-area" id="target-box-${index}" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="target-label">${target.label}</div></div>`;
+                    });
+                } else {
+                    targetsWrapper.innerHTML = `<div class="target-area" id="target-box-0" ondrop="drop(event)" ondragover="allowDrop(event)" style="flex:1;"><div class="target-label">Answer Area (Drop here in order)</div></div>`;
+                }
+            }
+            else if (q.type === "hotspot") {
+                hsContainer.style.display = "block";
+                let html = `<table class="hotspot-table"><tr><th>Statements</th><th>Yes</th><th>No</th></tr>`;
+                q.statements.forEach((stmt, index) => {
+                    html += `<tr id="hs-row-${index}">
+                        <td>${stmt.text}</td>
+                        <td onclick="document.getElementById('yes-${index}').checked = true;"><input type="radio" id="yes-${index}" name="hs-${index}" value="Yes"></td>
+                        <td onclick="document.getElementById('no-${index}').checked = true;"><input type="radio" id="no-${index}" name="hs-${index}" value="No"></td>
+                    </tr>`;
+                });
+                html += `</table>`; hsContainer.innerHTML = html;
+            }
+            else if (q.type === "dropdown" || q.type === "inline_dropdown") {
+                dropdownContainer.style.display = "block";
+                let html = '<div class="dd-area" style="text-align:left; overflow-x:auto;"><h3>Answer Area</h3><br>';
+                
+                if (q.type === "inline_dropdown") {
+                    let template = q.inlineTemplate;
+                    q.dropdowns.forEach((dd, index) => {
+                        let selectHtml = `<select id="sel-${index}" class="dd-select" style="width:auto; display:inline-block; margin: 0 5px; font-family:sans-serif; font-size:1em; padding: 5px;"><option value="">-- Select --</option>`;
+                        dd.options.forEach(opt => { selectHtml += `<option value="${opt}">${opt}</option>`; });
+                        selectHtml += `</select>`;
+                        template = template.replace(`[DD${index}]`, selectHtml);
+                    });
+                    html += `<div style="font-family: monospace; font-size: 1.1em; white-space: normal; word-wrap: break-word; padding: 15px; background: white; border: 1px solid #ccc; border-radius: 5px;">${template}</div>`;
+                } else {
+                    q.dropdowns.forEach((dd, index) => {
+                        html += `<div class="dd-row"><div class="dd-label">${dd.label}</div><select id="sel-${index}" class="dd-select"><option value="">-- Select --</option>`;
+                        dd.options.forEach(opt => { html += `<option value="${opt}">${opt}</option>`; });
+                        html += `</select></div>`;
+                    });
+                }
+                html += '</div>'; dropdownContainer.innerHTML = html;
+            }
+
+            if (questionStates[currentQuestion] !== null) {
+                showPastAnswerFeedback();
+            }
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault(); 
+            if(questionStates[currentQuestion] !== null) return;
+            const data = ev.dataTransfer.getData("text"); 
+            const draggedElement = document.getElementById(data);
+            
+            let dropZone = ev.target.closest('.target-area') || ev.target.closest('.dd-box');
+            if (dropZone) dropZone.appendChild(draggedElement);
+        }
+
+        function checkAnswer() {
+            if(questionStates[currentQuestion] !== null) return;
+            const q = quizData[currentQuestion];
+            let isCorrect = false;
+
+            if (!q.type || q.type === "mcq") {
+                const selectedOption = document.querySelector('input[name="option"]:checked');
+                if (!selectedOption) { alert('Please select an answer!'); return; }
+                isCorrect = (parseInt(selectedOption.value) === q.correctAnswerIndex);
+            } 
+            else if (q.type === "multiple_select") {
+                const selectedOptions = document.querySelectorAll('input[name="option"]:checked');
+                if (selectedOptions.length === 0) { alert('Please select your answers!'); return; }
+                const userAnswers = Array.from(selectedOptions).map(opt => parseInt(opt.value)).sort();
+                const correctAnswers = [...q.correctAnswerIndex].sort();
+                isCorrect = JSON.stringify(userAnswers) === JSON.stringify(correctAnswers);
+            }
+            else if (q.type === "dragdrop") {
+                if (q.targets) {
+                    let allCorrect = true;
+                    q.targets.forEach((target, index) => {
+                        const targetBox = document.getElementById(`target-box-${index}`);
+                        const items = Array.from(targetBox.querySelectorAll('.draggable')).map(el => el.innerText.trim());
+                        if (JSON.stringify(items.sort()) !== JSON.stringify(target.expected.sort())) allCorrect = false;
+                    });
+                    isCorrect = allCorrect;
+                } else {
+                    const targetItems = document.getElementById('target-box-0').querySelectorAll('.draggable');
+                    const userAnswers = Array.from(targetItems).map(el => el.innerText.trim());
+                    if (userAnswers.length === 0) { alert('Please drag answers to the area!'); return; }
+                    isCorrect = JSON.stringify(userAnswers) === JSON.stringify(q.correctOrder);
+                }
+            }
+            else if (q.type === "hotspot") {
+                let correctCount = 0; let answeredCount = 0;
+                q.statements.forEach((stmt, index) => {
+                    const selected = document.querySelector(`input[name="hs-${index}"]:checked`);
+                    if (selected) { answeredCount++; if (selected.value === stmt.correctAnswer) correctCount++; }
+                });
+                if (answeredCount < q.statements.length) { alert('Please answer all statements!'); return; }
+                isCorrect = (correctCount === q.statements.length);
+            }
+            else if (q.type === "dropdown" || q.type === "inline_dropdown") {
+                let correctCount = 0; let answeredCount = 0;
+                q.dropdowns.forEach((dd, index) => {
+                    const sel = document.getElementById(`sel-${index}`);
+                    if (sel.value !== "") answeredCount++;
+                    if (sel.value === dd.correctAnswer) correctCount++;
+                });
+                if (answeredCount < q.dropdowns.length) { alert('Please select options for all dropdowns!'); return; }
+                isCorrect = (correctCount === q.dropdowns.length);
+            }
+
+            questionStates[currentQuestion] = isCorrect;
+            if (isCorrect) score++;
+
+            document.getElementById('score-counter').innerText = `Score: ${score}`;
+            showPastAnswerFeedback();
+            drawNavigationGrid(); 
+        }
+
+        function showPastAnswerFeedback() {
+            const q = quizData[currentQuestion];
+            const expBox = document.getElementById('explanation-box');
+            if (questionStates[currentQuestion]) {
+                expBox.className = 'explanation correct-box'; expBox.innerHTML = "<h4>Correct! 🎉</h4>" + q.explanation;
+            } else {
+                expBox.className = 'explanation incorrect-box'; expBox.innerHTML = "<h4>Incorrect / Reviewed</h4>" + q.explanation;
+            }
+            expBox.style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; loadQuestion(); } }
+        function nextQuestion() { 
+            if (currentQuestion < quizData.length - 1) { currentQuestion++; loadQuestion(); } 
+            else { alert(`End of Exam! Total Score: ${score} / ${quizData.length}`); }
+        }
+
+        window.onload = loadQuestion;
+        
+    </script>
+</body>
+</html>

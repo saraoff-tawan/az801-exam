@@ -1,0 +1,1162 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Simulator - Template</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; max-width: 850px; margin: 0 auto; padding: 20px; line-height: 1.6;}
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .status-bar { display: flex; justify-content: space-between; margin-bottom: 20px; color: #222; font-weight: bold; font-size: 1.2em; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;}
+        .question-badge { background-color: #0078d4; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+        .question { font-size: 1.1em; margin-bottom: 20px;}
+        
+        /* แผงปุ่มกดข้ามข้อ (Navigation Grid) */
+        .nav-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; padding: 10px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; justify-content: center; }
+        .nav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background: white; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95em;}
+        .nav-btn:hover { background: #f0f0f0; border-color: #0078d4; }
+        .nav-btn.active { background: #0078d4; color: white; border-color: #0078d4; box-shadow: 0 2px 5px rgba(0,120,212,0.4); }
+        .nav-btn.answered-correct { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .nav-btn.answered-wrong { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+        /* สไตล์ตารางโจทย์ทั่วไป */
+        /* สไตล์ตารางโจทย์ทั่วไป */
+	.info-table { width: auto; min-width: 50%; max-width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95em; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .info-table th, .info-table td { border: 1px solid #aaa; padding: 8px; }
+        .info-table th { background: #e9ecef; text-align: left; }
+
+        /* ตัวเลือก MCQ (Radio และ Checkbox) */
+        .options label { display: block; padding: 15px; margin: 10px 0; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; cursor: pointer; transition: 0.2s;}
+        .options label:hover { background: #e2e6ea; }
+        input[type="radio"], input[type="checkbox"] { transform: scale(1.2); cursor: pointer; margin-right: 8px;}
+        
+        /* สไตล์ Drag & Drop (รองรับหลายกล่อง) */
+        .dd-wrapper { display: flex; gap: 20px; margin-top: 15px; align-items: flex-start; }
+        .dd-box { flex: 1; padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #fafafa; min-height: 200px; }
+        .dd-box h4 { margin-top: 0; color: #555; text-align: center; margin-bottom: 15px;}
+        .draggable { background: #0078d4; color: white; padding: 12px; margin-bottom: 10px; border-radius: 5px; cursor: grab; text-align: left; font-weight: 500; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        .draggable:active { cursor: grabbing; }
+        
+        /* กล่องเป้าหมายสำหรับลากวาง */
+        .target-container { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .target-area { padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #f0f8ff; min-height: 100px; }
+        .target-label { font-weight: bold; margin-bottom: 10px; color: #333; text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
+
+        /* สไตล์ Hotspot (ตาราง Yes/No) */
+        .hotspot-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        .hotspot-table th, .hotspot-table td { border: 1px solid #ccc; padding: 12px; }
+        .hotspot-table th { background: #0078d4; color: white; text-align: center; font-weight: bold; }
+        .hotspot-table td:first-child { width: 70%; font-weight: 500; }
+        .hotspot-table td:not(:first-child) { text-align: center; width: 15%; background: #f8f9fa; cursor: pointer;}
+
+        /* สไตล์ Dropdown */
+        .dd-area { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin-top: 15px; text-align: left; display: block; width: auto; overflow-x: auto}
+        .dd-row { margin-bottom: 10px; display: flex; align-items: center; flex-wrap: nowrap;}
+        .dd-label { width: 200px; text-align: right; margin-right: 15px; font-weight: bold; }
+        .dd-select { padding: 5px; font-size: 1em; width: auto; max-width: 170px; border: 1px solid #ccc; border-radius: 4px; }
+
+        /* ปุ่มและเฉลย */
+        .button-group { display: flex; justify-content: space-between; margin-top: 25px; }
+        .btn { background: #0078d4; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: bold;}
+        .btn:hover { background: #005a9e; }
+        .btn-secondary { background: #6c757d; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .explanation { margin-top: 25px; padding: 20px; border-radius: 5px; display: none; }
+        .correct-box { background: #d4edda; border-left: 5px solid #28a745; color: #155724; }
+        .incorrect-box { background: #f8d7da; border-left: 5px solid #dc3545; color: #721c24; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="navigation-grid" class="nav-grid"></div>
+
+        <div class="status-bar">
+            <span id="question-counter">Question: 1</span>
+            <span id="score-counter">Score: 0</span>
+        </div>
+        
+        <div id="question-text" class="question">Loading...</div>
+        
+        <div id="options-container" class="options" style="display: none;"></div>
+        
+        <div id="dragdrop-container" class="dd-wrapper" style="display: none;">
+            <div class="dd-box" id="source-box" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h4>Options</h4>
+            </div>
+            <!-- กล่องเป้าหมายจะถูกสร้างที่นี่ -->
+            <div id="targets-wrapper" class="target-container"></div>
+        </div>
+
+        <div id="hotspot-container" style="display: none;"></div>
+        <div id="dropdown-container" style="display: none;"></div>
+        
+<div class="button-group">
+
+    <div>
+        <button class="btn btn-secondary"
+            onclick="window.location.href='../index.html'">
+            🏠 Main Menu
+        </button>
+
+        <button class="btn btn-secondary"
+            id="prev-btn"
+            onclick="prevQuestion()">
+            &laquo; Back
+        </button>
+    </div>
+
+    <div>
+        <button class="btn" id="submit-btn"
+            onclick="checkAnswer()">
+            Submit Answer
+        </button>
+
+        <button class="btn"
+            id="next-btn"
+            onclick="nextQuestion()"
+            style="display:none;background:#28a745;">
+            Next Question &raquo;
+        </button>
+    </div>
+
+</div>        
+        <div id="explanation-box" class="explanation"></div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 🚨 นำโจทย์ข้อสอบมาวางใน Array นี้
+        // ==========================================
+        const quizData = [
+            // ==========================================
+            // Question 31 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "multiple_select",
+                question: "You have 20 on-premises virtual machines that run Windows Server.<br>You have an Azure subscription that contains a Microsoft Sentinel workspace named Workspace1.<br>You need to collect events from the on-premises virtual machines and forward the events to Workspace1. The solution must ensure that you can define filters to minimize the volume of collected events.<br><br>Which two components should you install on each virtual machine? Each correct answer presents part of the solution.<br>NOTE: Each correct selection is worth one point.",
+                options: [
+                    "A. the Azure Connected Machine agent",
+                    "B. the Azure VM Dependency agent extension for Windows",
+                    "C. the Azure Monitor agent",
+                    "D. the Log Analytics VM extension for Windows",
+                    "E. the Dependency agent"
+                ],
+                correctAnswerIndex: [0, 2], // A and C
+                explanation: "✅ <b>Explanation:</b><br><b>A. the Azure Connected Machine agent</b> และ <b>C. the Azure Monitor agent is correct" +
+                    "1. เพราะเป็นเครื่องแบบ <b>On-premises</b> จึงต้องติดตั้ง <b>Azure Connected Machine agent</b> ก่อน เพื่อดึงเครื่องเข้ามาบริหารจัดการบนคลาวด์ผ่านระบบ Azure Arc<br>" +
+                    "2. การใช้ฟีเจอร์ <b>'Define filters'</b> (กรอง Log เลือกส่งเฉพาะที่จำเป็นเพื่อประหยัดพื้นที่) เป็นความสามารถเด่นของ <b>Azure Monitor agent (AMA)</b> ที่ทำงานคู่กับ Data Collection Rules (DCR) ซึ่งเก่งกว่าตัวแทนรุ่นเก่าอย่าง Log Analytics VM extension (MMA)"
+            },
+            // ==========================================
+            // Question 32 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "Your on-premises network is connected to Azure.<br>You have an Azure subscription. The subscription contains a virtual machine named VM1 that runs Windows Server.<br>You need to identify the latency between the on-premises network and VM1.<br><br>Which Azure Network Watcher settings should you use?",
+                options: [
+                    "A. IP flow verify",
+                    "B. Connection monitor",
+                    "C. VPN troubleshoot",
+                    "D. Connection troubleshoot"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. Connection monitor</b> is correct.<br><br><b>เหตุผล:</b> หากต้องการวัดความหน่วง (Latency), ตรวจสอบอัตราแพ็กเก็ตสูญหาย (Packet loss) หรือดูเส้นทางการเชื่อมต่อ (Topology) แบบต่อเนื่องระหว่าง On-premises กับเครื่องบน Azure เครื่องมือที่เกิดมาเพื่อสิ่งนี้ใน Network Watcher คือ <b>Connection monitor</b> ครับ"
+            },
+            // ==========================================
+            // Question 33 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your network contains an Active Directory domain. The domain contains a domain controller named DC1 and a server named Server1 that runs Windows Server.<br>You need to enable event log subscriptions to forward events from DC1 to Server1.<br><br>Which command should you run to enable the Windows Event Collector service, and on which servers should you run the command? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q33-dd1", 
+                        label: "Command to run:", 
+                        options: ["wecutil qc/q", "wevtutil gl", "winrm quickconfig"], 
+                        correctAnswer: "wecutil qc/q" 
+                    },
+                    { 
+                        id: "q33-dd2", 
+                        label: "Run on which server:", 
+                        options: ["DC1 only", "Server1 only", "DC1 and Server1"], 
+                        correctAnswer: "Server1 only" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b><br>• โจทย์สั่งให้ส่ง Log จาก DC1 ไปกองรวมไว้ที่ Server1 ดังนั้น Server1 จึงทำหน้าที่เป็นตัวรวบรวม <br>ต้องใช้คำสั่งใดเพื่อเปิดใช้งานเซอร์วิส Windows Event Collector และต้องไปรันคำสั่งนี้ที่เครื่องไหน?(Collector)<br><b>• wecutil qc/q :</b> คำสั่งสำหรับเปิดใช้งาน Windows Event Collector service อย่างรวดเร็วคือ <br><b>• Server1 only :</b> คำสั่งนี้จะต้องนำไปรันบนเครื่องที่เป็น <b>Collector เท่านั้น</b> (นั่นคือ <b>Server1 only</b>) ส่วนฝั่งเครื่องต้นทาง (DC1) จะต้องรันคำสั่ง <code>winrm quickconfig</code> ครับ"
+            },
+            // ==========================================
+            // Question 34 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "<b>Note:</b> This question is part of a series of questions that present the same scenario. Each question in the series contains a unique solution that might meet the stated goals. Some question sets might have more than one correct solution, while others might not have a correct solution.<br><br>You have an on-premises server named Server1 that runs Windows Server.<br>You have a Microsoft Sentinel instance.<br>You add the Windows Firewall data connector in Microsoft Sentinel.<br>You need to ensure that Microsoft Sentinel can collect Windows Firewall logs from Server1.<br><br><b>Solution:</b> You install the Azure Connected Machine agent and Azure Monitor Agent for Windows extension on Server1.<br><br>Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 0, // A
+                explanation: "✅ <b>Explanation:</b><br><b>A. Yes</b> is correct.<br><br><b>เหตุผล:</b> นี่คือกระบวนการมาตรฐานที่สมบูรณ์ที่สุด เครื่อง On-premises จะต้องลง <b>Azure Connected Machine agent</b> (เพื่อดึงเข้า Azure Arc) และตามด้วยการติดตั้ง <b>Azure Monitor Agent (AMA)</b> เพื่อดึง Windows Firewall Logs ไปส่งให้ Microsoft Sentinel"
+            },
+            // ==========================================
+            // Question 35 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dragdrop",
+                question: "DRAG DROP - <br>You have an on-premises server named Server1 that runs Windows Server.<br>You have an Azure subscription.<br>You create a Microsoft Sentinel workspace named Workspace1.<br>You need to ensure that Workspace1 can collect events from Server1 by using the Windows Security Events via AMA data connector.<br>You add Server1 to Azure Arc.<br><br>Which actions should you perform next in sequence? To answer, drag the appropriate actions to the correct order.",
+                draggables: [
+                    "Create a Data Collection Rule (DCR).",
+                    "Associate the Data Collection Rule (DCR) with Server1.",
+                    "Install the Log Analytics agent on Server1.",
+                    "Open Workspace1 in Microsoft Sentinel."
+                ],
+                targets: [
+                    { 
+                        label: "Step 1", 
+                        expected: ["Open Workspace1 in Microsoft Sentinel."]
+                    },
+                    { 
+                        label: "Step 2", 
+                        expected: ["Create a Data Collection Rule (DCR)."] 
+                    },
+                    {   label: "Step 3",
+                        expected: ["Associate the Data Collection Rule (DCR) with Server1."]
+                    }
+            
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b> ในกระบวนการใช้ Azure Monitor Agent (AMA) คุณไม่ได้คอนฟิกที่ตัว Agent ตรงๆ เหมือนสมัยก่อนแล้ว แต่ต้องไปตั้งค่าจากส่วนกลางผ่าน <b>Data Collection Rule (DCR)</b><br>1. <b>Open Workspace1 in Microsoft Sentinel. (โจทย์ให้มาแล้ว)</b><br>2. <b>Create a DCR:</b> สร้างกฎขึ้นมาก่อนว่าต้องการดึง Log ชนิดไหน และจะส่งไปที่ Workspace ไหน<br>3. <b>Associate:</b> นำกฎนั้นไปผูก (Assign) เข้ากับ Server1 (ที่ต่อ Arc ไว้แล้ว) ระบบจะสั่งติดตั้งและจ่ายกฎให้ Server1 อัตโนมัติครับ"
+            },
+            // ==========================================
+            // Question 36 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription. The subscription contains a virtual machine named VM1 that runs Windows Server and is in the East US Azure region. The subscription contains the storage accounts shown in the following table.<br><br>" +
+                          "<table class='info-table'><tr><th>Name</th><th>Kind</th><th>Location</th><tr>" +
+                          "<tr><td>Storage1</td><td>StaorageV2</td><td>East US</td><tr>" +
+                          "<tr><td>Storage2</td><td>BlockBlobStorage</td><td>East US</td><tr>" +
+                          "<tr><td>Storage3</td><td>File Storage</td><td>East US</td><tr>" +
+                          "<tr><td>Storage4</td><td>StaorageV2</td><td>Central US</td></tr></table>" + 
+                          "You Plan to configure the Diagnostic settings for VM1.<br>Which storage accounts should you specify for the settings?",
+                options: [
+                    "A. storage1 only",
+                    "B. storage1 and storage2 only",
+                    "C. storage1 and storage4 only",
+                    "D. storage1, storage2, and storage3 only",
+                    "E. storage1, storage2, storage3, and storage4"
+                ],
+                correctAnswerIndex: 0, // A
+                explanation: "✅ <b>Explanation:</b><br><b>A. storage1 only</b> is correct.<br>" +
+                             "<b>เหตุผล:</b><br>" +
+                             "1. Storage Account ปลายทาง ต้องอยู่ใน Region เดียวกัน กับ Resource ต้นทางที่ต้องการจะ Monitor<br>" +
+                             "2. ในโจทย์ VM1 อยู่ที่ East US ดังนั้น storage4 ซึ่งอยู่ที่ Central US จึงไม่เข้าเงื่อนไขและถูกตัดทิ้งทันที<br>" +
+                             "3. Azure รองรับการส่ง Diagnostic Data ไปยัง Storage Account แบบ Standard (General-purpose อย่าง StorageV1 หรือ StorageV2) เท่านั้น<br>" +
+                             "4. มีเพียง storage1 บัญชีเดียวเท่านั้นที่ผ่านเงื่อนไขครบทั้งสองข้อ คือเป็นประเภท StorageV2 (รองรับการใช้งาน) และอยู่ใน East US (Region เดียวกับ VM1 พอดี)"
+            },
+            // ==========================================
+            // Question 37 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription. The subscription contains a virtual machine named VM1 that runs Windows Server and uses Azure Disk Encryption.<br>You need to identify which Azure key vault stores the encryption keys for VM1. The solution must minimize administrative effort.<br><br>Which PowerShell cmdlet should you run?",
+                options: [
+                    "A. Get-AzKeyVaultKey",
+                    "B. Get-AzKeyVault",
+                    "C. Get-AzVMDiskEncryptionStatus",
+                    "D. Get-AzDiskEncryptionSet"
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. Get-AzVMDiskEncryptionStatus</b> is correct.<br><br><b>เหตุผล:</b> คำสั่ง <code>Get-AzVMDiskEncryptionStatus</code> ออกแบบมาเพื่อตรวจเช็กสถานะการเข้ารหัสของ VM แบบตรงจุดที่สุด ซึ่งในผลลัพธ์ของคำสั่งนี้ จะมีพารามิเตอร์ <b>KeyVaultUrl</b> ที่จะบอกคุณทันทีว่ากุญแจที่ใช้เข้ารหัส VM ตัวนี้ถูกเก็บไว้ที่ Key Vault โหลไหน ซึ่งใช้ความพยายามน้อยที่สุด (ไม่ต้องไปไล่งมหาจากฝั่ง Key Vault เอง) ครับ"
+            },
+            // ==========================================
+            // Question 38 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure virtual machine named VM1. You install an application on VM1 and then restart the virtual machine.<br>After the restart, the following error message displays: <i>Boot failure. Reboot and Select proper Boot Device or Insert Boot Media in selected Boot Device.</i><br>You need to attach the operating system disk offline from VM1 to a temporary virtual machine to troubleshoot the issue.<br><br>Which command should you run in Azure CLI?",
+                options: [
+                    "A. az vm capture",
+                    "B. az vm repair create",
+                    "C. az vm disk create",
+                    "D. az vm boot-diagnostics enable"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. az vm repair create</b> is correct.<br><br><b>เหตุผล:</b> คำสั่ง <code>az vm repair create</code> จะทำการสร้าง VM ซ่อมบำรุง (Temporary VM) ขึ้นมาให้ใหม่ และทำการดึงเอา OS Disk ของ VM1 ที่พัง (Boot failure) มาเสียบเข้าไปให้โดยอัตโนมัติ เพื่อให้เราสามารถเข้าไปแก้ไขไฟล์บูตของมันได้ครับ"
+            },
+            // ==========================================
+            // Question 39 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "multiple_select",
+                question: "HOTSPOT - <br>You have an on-premises server named Server1 that runs Windows Server.<br>You have a Microsoft Sentinel workspace named sentinel.<br>You need to collect Windows Defender Firewall events from Server1 to sentinel.<br><br>Which two pages should you use in the Azure portal? To answer,<br>" +
+                "<img src=\"images5/Q39-1.jpg\" alt=\"VM Menu\" style=\"max-width: 25%; height: auto; border: 1px solid #ccc; border-radius: 5px; margin-top: 15px;\"><br>" +
+                " Which two pages should you use in the Azure portal? To answer, Select the appropriate pages.<br>NOTE: Each correct selection is worth one point.",
+                options: [
+                    "A. Content hub",
+                    "B. Repositories(Preview)",
+                    "C. Community",
+                    "D. Workspace manager (Preview)",
+                    "E. Data Connectors",
+                    "F. Analytics",
+                    "G. Watchlist",
+                    "H. Automation",
+                    "I. Setting"
+                ],
+                correctAnswerIndex: [0, 4], // A and E
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b><br>" +
+                "<b>หน้าแรกที่ต้องเลือกคือ Content hub และหน้าที่สองคือ Data connectors</b><br>" +
+                "1. ถ้าโจทย์ถามเรื่อง การเตรียมการ หรือ ทำครั้งแรก เพื่อรับ Log ยุคใหม่ ➡️ Content hub คือจุดเริ่มต้นเสมอครับ<br>" +
+                "2. ถ้าโจทย์ถามเรื่อง การเชื่อมต่อข้อมูล หรือ การตั้งค่าตัวรับ Log ➡️ Data connectors คือคำตอบ<br>" +
+                "<img src=\"images5/Q39-2.jpg\" alt=\"Answer\" style=\"max-width: 30%; height: auto; border: 1px solid #ccc; border-radius: 5px; margin-top: 10px;\">"
+            },
+            // ==========================================
+            // Question 40 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains several servers that run Windows Server as show in the following table.<br>" +
+			  "<table class='info-table'><tr><th>Name</th><th>Discription</th><tr>" +
+                          "<tr><td>Server1</td><td>Domain controller that has the PDC emulator FSMO role</td><tr>" +
+                          "<tr><td>Server2</td><td>Domain controller</td><tr>" +
+                          "<tr><td>Server3</td><td>Has the Active Directory Certificate Services role</td><tr>" +
+                          "<tr><td>Server4</td><td>HasMicrosoft Entra Connect installed</td><tr></table>" +
+		          "You need to implement Microsoft Defender for Identity. The solution must meet the following requirements:<br>" +
+			  "• Ensure that all AD DS authentication events are captured.<br>" +
+			  "• Prevent the use of port mirroring.<br>" +
+			  "<br>What should you deploy in the domain, and what is the minimum number of Defender for Identity sensors that you should deploy? To answer, select the appropriate options in the answer area.",
+
+                dropdowns: [
+                    { 
+                        id: "q40-dd1", 
+                        label: "Create:", 
+                        options: ["A computer object", "A group managed service account (gMSA)", "A service principal name (SPN)"], 
+                        correctAnswer: "A group managed service account (gMSA)" 
+                    },
+                    { 
+                        id: "q40-dd2", 
+                        label: "Number of servers to deploy", 
+                        options: ["1", "2", "3", "4"], 
+                        correctAnswer: "2" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b><br>" +
+			     "<b>• โจทย์ต้องการให้ติดตั้ง Microsoft Defender for Identity โดยมีเงื่อนไข:</b><br>" +
+			     "1. ต้องเก็บเหตุการณ์การยืนยันตัวตน (Authentication events) ของ AD DS ทั้งหมด<br>" +
+			     "2. ห้ามใช้ Port Mirroring (นี่คือคีย์เวิร์ดสำคัญครับ)<br>" +
+			     "• Create: เลือก A group managed service account (gMSA)<br>" +
+			     "Microsoft Defender for Identity จำเป็นต้องมีบัญชีบริการ (Service Account) เพื่อเข้าไปอ่านข้อมูลใน Active Directory<br>" +
+			     "ตามมาตรฐานความปลอดภัย (Best Practice) ของ Microsoft แนะนำให้ใช้ group Managed Service Account (gMSA) เพราะระบบจะจัดการเปลี่ยนรหัสผ่านให้อัตโนมัติและมีความปลอดภัยสูงกว่าบัญชีธรรมดา<br>" +
+			     "• Number of sensors to deploy: เลือก 2<br>" +
+			     "เมื่อไม่ใช้ Port Mirroring (ซึ่งต้องใช้ Standalone Sensor) เราจึงต้องติดตั้ง Defender for Identity Sensor ลงไปที่ตัว Domain Controller (DC) โดยตรงเลย<br>" +
+			     "ในโจทย์นี้เรามี Domain Controller อยู่ 2 ตัว คือ Server1 และ Server2 ดังนั้นเราจึงต้องลง Sensor ที่ทั้งสองเครื่องนี้เพื่อให้เก็บข้อมูลได้ครบถ้วนทุกเหตุการณ์ที่เกิดขึ้นใน Domain <br>" +
+			     "<b>หมายเหตุ:</b><br> Server 3 และ 4 ไม่ใช่ Domain Controller จึงไม่ต้องลง Sensor ในการตั้งค่าขั้นต้นนี้ครับ<br>"
+            },
+            // ==========================================
+            // Question 41 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have an Azure subscription that contains two virtual machines named VM1 and VM2. VM1 runs Windows Server. VM2 runs Ubuntu Linux.<br>You need to monitor VM1 and VM2 by using VM insights. The solution must meet the following requirements:<br>• Ensure that you can monitor the memory usage on VM1.<br>• Ensure that you run the Map feature on VM2.<br><br>The solution must minimize the number of agents required for each virtual machine.<br><br>Which agents are required on each virtual machine? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q41-dd1", 
+                        label: "VM1 (Memory usage only):", 
+                        options: ["Azure Monitor Agent only", "Log Analytics agent only", "Log Analytics agent and Dependency agent"], 
+                        correctAnswer: "Azure Monitor Agent only" 
+                    },
+                    { 
+                        id: "q41-dd2", 
+                        label: "VM2 (Map feature):", 
+                        options: ["Azure Monitor Agent only", "Log Analytics agent only", "Log Analytics agent and Dependency agent"], 
+                        correctAnswer: "Log Analytics agent and Dependency agent" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b><br>• <b>VM1:</b> ต้องการแค่ดู Memory usage ซึ่ง <b>Azure Monitor Agent (AMA)</b> ตัวเดียวก็เพียงพอที่จะดึงข้อมูล Performance counter มาให้ได้แล้วครับ (ประหยัด Agent ที่สุด)<br>• <b>VM2:</b> ต้องการใช้งาน <b>Map feature</b> (ฟีเจอร์สร้างแผนที่เครือข่ายความสัมพันธ์ระหว่าง Process) ฟีเจอร์นี้บังคับว่าต้องใช้คู่หูคือ <b>Log Analytics agent และ Dependency agent</b> ทำงานร่วมกันครับ (ปัจจุบัน AMA ก็ใช้คู่กับ Dependency Agent ได้เช่นกัน แต่ถ้าอ้างอิงตามชุดข้อสอบคลาสสิกของ VM Insights จะถือคู่นี้เป็นมาตรฐานครับ)"
+            },
+            // ==========================================
+            // Question 42 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have an Azure subscription. The subscription contains two virtual machines named VM1 and VM2 that run Windows Server.<br>You need to use Azure Network Watcher to meet the following requirements:<br>• Identify security rules that prevent network traffic from reaching VM1.<br>• Identify the source region of packets sent to VM2.<br><br>What should you use for each requirement? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q42-dd1", 
+                        label: "Identify rules that prevent network traffic from reaching VM1:", 
+                        options: ["IP flow verify", "Connection troubleshoot", "Next hop", "Packet capture", "Traffic Analytics"], 
+                        correctAnswer: "IP flow verify" 
+                    },
+                    { 
+                        id: "q42-dd2", 
+                        label: "Identify source region of packets send to VM2:", 
+                        options: ["IP flow verify", "Connection troubleshoot", "Next hop", "Packet capture", "Traffic Analytics"], 
+                        correctAnswer: "Traffic Analytics" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b><br>• <b>IP flow verify:</b> เป็นเครื่องมือที่ใช้จำลองการส่ง Packet เพื่อตรวจสอบว่ามี Network Security Group (NSG) rule ข้อไหนที่ Block (Deny) หรือ Allow ทราฟฟิกนั้นๆ อยู่</b><br>• <b>Traffic Analytics:</b> เป็นฟีเจอร์ที่นำข้อมูลจาก NSG Flow Logs มาวิเคราะห์เชิงลึก โดยสามารถแสดงข้อมูลตำแหน่งทางภูมิศาสตร์ (Geographic location / Region) ของต้นทางที่ส่งทราฟฟิกเข้ามาได้"
+            },
+            // ==========================================
+            // Question 43 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have a server named Server1 that runs Windows Server.<br>You install System Insights on Server1.<br>You need to modify the schedule for storage consumption forecasting.<br><br>What should you use?",
+                options: [
+                    "A. Resource Monitor",
+                    "B. Server Manager",
+                    "C. Windows Admin Center",
+                    "D. Performance Monitor"
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. Windows Admin Center</b> is correct.<br><br><b>เหตุผล:</b> ฟีเจอร์ที่ใช้ AI ทำนายแนวโน้มในอนาคตของเครื่องอย่าง <b>System Insights</b> จะสามารถตั้งค่า จัดการตารางเวลา และแสดงผลกราฟิกได้อย่างสมบูรณ์แบบผ่าน Extension ที่ติดตั้งอยู่บน <b>Windows Admin Center</b> ครับ (เครื่องมือเก่าๆ อย่าง Server Manager หรือ Performance Monitor จะไม่รองรับการจัดการ System Insights)"
+            },
+            // ==========================================
+            // Question 44 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "inline_dropdown",
+                question: "HOTSPOT - <br>You have an Azure subscription. The subscription contains a virtual machine named VM1 that runs Windows Server.<br>The network interface for VM1 is disabled in the operating system.<br>You need to enable the network interface by using the Azure Serial Console.<br><br>How should you complete the command? To answer area.",
+                inlineTemplate: "[DD0][DD1]set interface name=\"Ethernet\" admin-enable",
+                dropdowns: [
+                    {
+                        id: "q44-dd1", 
+                        label: "Command", 
+                        options: ["ipconfig", "netsh", "WinMgmt", "wmic"], 
+                        correctAnswer: "netsh"
+                    }, 
+                    {
+                        id: "q44-dd2", 
+                        label: "Command", 
+                        options: ["Add", "bridge", "interface", "lan", "netio"], 
+                        correctAnswer: "interface"
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><b>A. netsh interface set interface \"Ethernet\" admin=enable</b> is correct.<br><br><b>เหตุผล:</b> เมื่อเผลอไปกดปิดการ์ดแลน (Disable Network Interface) ภายใน OS จนรีโมทเข้าไม่ได้ การใช้ <b>Azure Serial Console</b> เป็นทางออกเดียว และคำสั่งแบบ Command Line รุ่นเก่าสุดคลาสสิกที่จะสั่งเปิดการ์ดแลนชื่อ Ethernet กลับขึ้นมาได้ชัวร์ๆ คือ <code>netsh interface set interface \"Ethernet\" admin=enable</code> ครับ (หรือถ้าเข้าระบบในโหมด PowerShell ก็สามารถใช้ Enable-NetAdapter ได้เช่นกัน แต่ในข้อสอบมักอ้างอิงชุดคำสั่ง netsh พื้นฐานสำหรับ CMD ครับ)"
+            },
+// ==========================================
+            // Question 45 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription. The subscription contains a virtual machine named VM1 that runs Windows Server. A network interface named NI1 is assigned to VM1.<br>The Ethernet adapter on VM1 is disabled.<br>You need to use the Azure portal to enable the adapter.<br><br>What should you use from the portal?",
+                options: [
+                    "A. the Configuration settings for VM1",
+                    "B. the Reset password settings for VM1",
+                    "C. the IP configurations settings for NI1",
+                    "D. the Diagnostic settings for NI1",
+                    "E. the Diagnostic settings for VM1"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. the Reset password settings for VM1</b> is correct.<br><br><b>เหตุผล:</b> นี่คือทริกสำคัญของ Azure ครับ เมื่อการ์ดแลน (Ethernet adapter) ถูก Disable ไปจากภายใน OS ทำให้เราเชื่อมต่อไม่ได้ ฟีเจอร์ <b>'Reset password'</b> ในหน้า Portal จะมีตัวเลือก <b>'Reset configuration only'</b> ซึ่งจะช่วยทำการคืนค่าและเปิดใช้งาน Network Interface ของ VM นั้นให้กลับมาใช้งานได้อีกครั้งครับ"
+            },
+            // ==========================================
+            // Question 46 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains a server named Server1 that runs Windows Server.<br>You add a user named Admin1 to the domain.<br>You need to ensure that Admin1 can create a Data Collector Set on Server1. The solution must follow the principle of least privilege.<br><br>To which security group should you add Admin1, and what should Admin1 use to create the Data Collector Set? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q46-dd1", 
+                        label: "Security group:", 
+                        options: ["Administrators", "Event Log Readers", "Performance Log Users", "Performance Monitor Users", "Power User"], 
+                        correctAnswer: "Performance Log Users" 
+                    },
+                    { 
+                        id: "q46-dd2", 
+                        label: "Use:", 
+                        options: ["Performance Monitor", "Resource Monitor", "Server Manager", "Windows Admin Center"], 
+                        correctAnswer: "Performance Monitor" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b><br>• <b>Security Group:</b> เพื่อให้เป็นไปตามหลัก Least privilege (ให้สิทธิ์น้อยที่สุดที่ทำงานได้) คุณต้องเอา user เข้ากลุ่ม <b>Performance Log Users</b> ครับ (หากเป็นกลุ่ม Performance Monitor Users จะดูได้อย่างเดียว แต่สร้าง Data Collector Set ไม่ได้)<br>• <b>Tool:</b> เครื่องมือพื้นฐานในการสร้าง Data Collector Set ก็คือ <b>Performance Monitor</b> ครับ"
+            },
+            // ==========================================
+            // Question 47 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have multiple servers that run Windows Server.<br>You plan to use System Insights to collect information about your environment and systems.<br><br>How many default System Insights capabilities can you use for capacity forecasting?",
+                options: [
+                    "A. 3",
+                    "B. 4",
+                    "C. 5",
+                    "D. 6"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. 4</b> is correct.<br><br><b>เหตุผล:</b> ฟีเจอร์ System Insights ใน Windows Server จะมีความสามารถพื้นฐาน (Default capabilities) สำหรับการทำนายแนวโน้ม (Forecasting) มาให้ทั้งหมด <b>4 อย่าง</b> ได้แก่:<br>1. CPU capacity forecasting<br>2. Networking capacity forecasting<br>3. Total storage consumption forecasting<br>4. Volume consumption forecasting"
+            },
+            // ==========================================
+            // Question 48 (Topic 5) - Table Updated
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have the servers shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Operating System</th><th>Member of</th></tr>" +
+                          "<tr><td>Server1</td><td>Windows Server</td><td>Active Directory</td></tr>" +
+                          "<tr><td>Server2</td><td>Windows Server</td><td>Workgroup</td></tr>" +
+                          "</table><br>" +
+                          "You need to ensure that you can validate network connectivity from Server1 to Server2 by using the ping command.<br><br>" +
+                          "What should you do first?",
+                options: [
+                    "A. For Server2, enable the File and Printer Sharing (Echo Request – ICMPv4-In) firewall rule.",
+                    "B. For Server2, add a connection security rule.",
+                    "C. For Server1, enable the File and Printer Sharing (Echo Request – ICMPv4-Out) firewall rule.",
+                    "D. For Server1, add a connection security rule.",
+                    "E. From Server2, run winrm quickconfig."
+                ],
+                correctAnswerIndex: 0, // A
+                explanation: "✅ <b>Explanation:</b><br><b>A. For Server2, enable the File and Printer Sharing (Echo Request – ICMPv4-In) firewall rule.</b> is correct.<br><br><b>เหตุผล:</b> คำสั่ง `ping` ทำงานโดยใช้โปรโตคอล ICMP (Echo Request) ดังนั้นหากต้องการให้ Server1 ปิงไปหา Server2 แล้วได้รับการตอบกลับ คุณจะต้องไปเปิดกฎ Firewall ขาเข้าที่เครื่องปลายทาง <b>(Server2)</b> เพื่ออนุญาต <b>ICMPv4-In</b> ครับ (โดยปกติ Windows Firewall จะบล็อกการปิงจากคนอื่นไว้เป็นค่าเริ่มต้น)"
+            },
+	    // ==========================================
+            // Question 49 (Topic 5) - Best Format (Dropdown + Images)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have 50 on-premises servers that run Windows Server.<br>You have an Azure subscription that contains a Microsoft Sentinel workspace.<br>You plan to monitor the servers by using Microsoft Sentinel.<br>You need to perform the following actions in Microsoft Sentinel from the Azure portal:<br>• Add the Windows Forwarded Events data connector.<br>• Create a playbook that has an incident trigger.<br><br>Which two settings should you use? To answer, select the appropriate settings in the answer area.<br><br><img src=\"images5/Q49-1.jpg\" alt=\"Sentinel Menu\" style=\"max-width: 30%; height: auto; border: 1px solid #ccc; border-radius: 5px; margin-top: 15px;\">",
+                dropdowns: [
+                    { 
+                        id: "q49-dd1", 
+                        label: "Action 1: Add the Windows Forwarded Events data connector", 
+                        options: [
+                            "Incidents", "Workbooks", "Hunting", "Notebooks", "Entity behavior", 
+                            "Threat intelligence", "Content hub (Preview)", "Repositories (Preview)", 
+                            "Community", "Workspace manager (Preview)", "Data connectors", 
+                            "Analytics", "Watchlist", "Automation", "Settings"
+                        ], 
+                        correctAnswer: "Data connectors" 
+                    },
+                    { 
+                        id: "q49-dd2", 
+                        label: "Action 2: Create a playbook that has an incident trigger", 
+                        options: [
+                            "Incidents", "Workbooks", "Hunting", "Notebooks", "Entity behavior", 
+                            "Threat intelligence", "Content hub (Preview)", "Repositories (Preview)", 
+                            "Community", "Workspace manager (Preview)", "Data connectors", 
+                            "Analytics", "Watchlist", "Automation", "Settings"
+                        ], 
+                        correctAnswer: "Automation" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b><br>• การจะเพิ่ม Data Connector เข้าไปใน Sentinel คุณจะต้องไปที่เมนู <b>Data connectors</b><br>• ส่วน Playbook (ซึ่งเป็นเหมือนสคริปต์อัตโนมัติของ Sentinel) จะถูกจัดเก็บและสร้างผ่านเมนู <b>Automation</b> ครับ<br><br><img src=\"images5/Q49-2.jpg\" alt=\"Answer\" style=\"max-width:30%; height: auto; border: 1px solid #ccc; border-radius: 5px; margin-top: 10px;\">"
+            },
+            // ==========================================
+            // Question 50 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription. The subscription contains two virtual machines named VM1 and VM2 that run Windows Server.<br>VM1 experiences a stop error and fails to start.<br>You need to review the memory dump file of the error.<br><br>What should you do first?",
+                options: [
+                    "A. On VM2, run Azure Serial Console.",
+                    "B. Attach the OS disk of VM1 to VM2.",
+                    "C. On VM1, run Azure Serial Console.",
+                    "D. For VM1, enable boot diagnostics."
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. Attach the OS disk of VM1 to VM2.</b> is correct.<br><br><b>เหตุผล:</b> เมื่อ VM1 ขึ้นจอฟ้า (Stop error) และบูสต์ไม่ขึ้น วิธีเดียวที่จะเข้าไปดึงไฟล์ Memory dump ออกมาวิเคราะห์ได้ คือต้องถอด OS disk ของ VM1 ออกมา แล้วเอาไปเสียบเป็น Data disk ให้กับเครื่องปกติ (VM2) จากนั้นจึงเข้าไปดึงไฟล์ออกมาครับ"
+            },
+            // ==========================================
+            // Question 51 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dragdrop",
+                question: "DRAG DROP - <br>You have a server named Server1 that runs Windows Server.<br>For Server1, you enable the default App Control for Business policies in audit mode.<br>You need to ensure that specific third-party applications installed on Server1 are allowed to run by using App Control for Business.<br><br>Which four actions should you perform in sequence? To answer, drag the appropriate actions to the answer area and arrange them in the correct order.",
+                draggables: [
+                    "Run the set-CIPolicyVersion and Set-PCIPolicyIdInfo cmdlets.",
+                    "Run the Enable-OSConfigDriftControl cmdlet.",
+                    "Run the set-OSConfigDesiredConfiguration cmdlet.",
+                    "From the Windows Defender App Control Policy Wizard, generate an XML file.",
+                    "From Event Viewer, generate an EVTX file.",
+                    "Run the New-CIPolicy and New-CIPolicyRule cmdlets."
+                ],
+                targets: [
+                    { label: "Step 1", expected: ["From Event Viewer, generate an EVTX file."] },
+                    { label: "Step 2", expected: ["Run the New-CIPolicy and New-CIPolicyRule cmdlets."] },
+                    { label: "Step 3", expected: ["Run the set-CIPolicyVersion and Set-PCIPolicyIdInfo cmdlets."] },
+                    { label: "Step 4", expected: ["Run the set-OSConfigDesiredConfiguration cmdlet."] }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b>" +
+			     "<b>• ต้องอนุญาตให้แอปพลิเคชันจาก Third-party บางตัวที่คุณติดตั้งไว้สามารถรันได้จริง (โดยใช้ข้อมูลจากช่วงที่เราเปิดโหมด Audit ไว้มาสร้างกฎ):</b><br>" +
+			     "1. From Event Viewer, generate an EVTX file.:เพราะโจทย์บอกว่า Policy อยู่ใน Audit mode จึงต้อง Export Event Log ออกมาเป็น EVTX ก่อน<br>" +
+			     "2. Run the New-CIPolicy and New-CIPolicyRule cmdlets.:ใช้สร้าง Policy จาก Event Log (หรือสร้าง Rule เพิ่ม<br>" +
+			     "3. Run the Set-CIPolicyVersion and Set-CIPolicyIdInfo cmdlets.:ต้องกำหนด Version และ Policy ID ก่อนนำไปใช้งาน<br>" +
+			     "4. Run the Set-OSConfigDesiredConfiguration cmdlet.:การนำนโยบายไปบังคับใช้กับระบบในยุคปัจจุบัน จะถูกจัดการผ่าน OSConfig ซึ่งเป็นเครื่องมือใหม่สำหรับบริหารจัดการ Configuration แบบรวมศูนย์ การใช้คำสั่ง Set-OSConfigDesiredConfiguration จึงเป็นขั้นตอนสุดท้ายที่ถูกต้องที่สุดในการ Deploy นโยบายแทนการใช้วิธีการเดิม<br>"
+            },
+            // ==========================================
+            // Question 52 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have 100 Azure virtual machines that run Windows Server.<br>You plan to use Azure Monitor agents to track occurrences of event ID 1035 in the Application log of each virtual machine.<br>You need to ensure that the events will be available for analysis in Log Analytics. The solution must minimize the total volume of events stored in Azure.<br><br>What should you do? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q52-dd1", 
+                        label: "Create:", 
+                        options: ["A Log Analytics.custom log", "A Log Analytics scope configuration", "A Data Collection Rule (DCR)", "VM insights"], 
+                        correctAnswer: "A Data Collection Rule (DCR)" 
+                    },
+                    { 
+                        id: "q52-dd2", 
+                        label: "Filter the logs by using a:", 
+                        options: ["KQL query", "WQL query", "XPath query"], 
+                        correctAnswer: "XPath query." 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b><br>• <b>To configure:</b> การกำหนดว่า Azure Monitor Agent (AMA) จะเก็บ Log อะไรบ้าง ต้องทำผ่าน <b>Data Collection Rule (DCR)</b><br>• <b>To minimize:</b> ภายใน DCR จะใช้ภาษา <b>XPath query</b> ในการกรองเอาเฉพาะ Event ID 1035 เท่านั้น ทำให้ประหยัดพื้นที่จัดเก็บข้อมูลบนคลาวด์ได้มากครับ"
+            },
+            // ==========================================
+            // Question 53 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription. The subscription contains 100 virtual machines that run Windows Server 2025.<br>You plan to implement data collection rules (DCRs) in Azure Monitor to collect Application logs and System logs from the virtual machines.<br>You need to filter the events collected based on custom criteria.<br><br>Which query language should you use?",
+                options: [
+                    "A. LINQ",
+                    "B. KQL",
+                    "C. XPath",
+                    "D. WQL"
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. XPath</b> is correct.<br><br><b>เหตุผล:</b> สำหรับ Data Collection Rules (DCRs) เมื่อเราต้องการกำหนด Filter ในระดับ Agent (เพื่อบอกว่าให้ส่ง Event ไหนขึ้นมา ไม่ส่ง Event ไหน) ภาษาที่ใช้เขียนเงื่อนไขนี้คือ <b>XPath</b> ครับ (ส่วน KQL จะใช้สืบค้นข้อมูลหลังจากที่มันถูกส่งเข้าไปอยู่ใน Log Analytics Workspace แล้ว)"
+            },
+            // ==========================================
+            // Question 54 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription. The subscription contains a virtual machine named VM1 that runs Windows Server.<br>You enable Microsoft Defender for Servers Plan 2.<br>You need to implement File Integrity Monitoring (FIM).<br><br>What should you create first?",
+                options: [
+                    "A. a Log Analytics workspace",
+                    "B. a private endpoint",
+                    "C. a storage account",
+                    "D. a data collection rule (DCR)"
+                ],
+                correctAnswerIndex: 0, // A
+                explanation: "✅ <b>Explanation:</b><br><b>A. a Log Analytics workspace</b> is correct.<br><br><b>เหตุผล:</b> ฟีเจอร์ File Integrity Monitoring (FIM) ใน Microsoft Defender จะต้องพึ่งพากลไกการเก็บข้อมูลแบบรวมศูนย์ ดังนั้นสิ่งแรกที่คุณต้องมีก่อนจะเปิดฟีเจอร์นี้ได้ คือต้องสร้าง <b>Log Analytics workspace</b> เพื่อเป็นถังรองรับข้อมูลครับ"
+            },
+            // ==========================================
+            // Question 55 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure virtual machine named VM1 that runs Windows Server.<br>VM1 fails to start properly.<br>You need to review the serial log to identify the issue.<br><br>What should you use from the VM1 blade in the Azure portal?",
+                options: [
+                    "A. Diagnose and solve problems",
+                    "B. Boot diagnostics",
+                    "C. Change tracking",
+                    "D. Performance diagnostics",
+                    "E. Resource health"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. Boot diagnostics</b> is correct.<br><br><b>เหตุผล:</b> เมื่อเครื่องบูสต์ไม่ขึ้นและคุณต้องการขอดู <b>Serial log</b> หรือภาพหน้าจอตอนบูสต์ (Screenshot) เมนูเดียวใน Azure Portal ที่เก็บข้อมูลช่วงนี้ไว้ให้คือ <b>Boot diagnostics</b> ครับ"
+            },
+            // ==========================================
+            // Question 56 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "inline_dropdown",
+                inlineTemplate: "[DD0] filter add -i 192.168.0.100 -t [DD1] sync",
+                question: "HOTSPOT - <br>You have a server named Server1 that runs Windows Server.<br>You need to capture the SYN packets exchanged between Server1 and an IP address of 192.168.0.100.<br><br>How should you complete the command? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q56-dd1", 
+                        options: ["MessageAnalyzer", "netmon", "pktmon"], 
+                        correctAnswer: "pktmon" 
+                    },
+                    { 
+                        id: "q56-dd2", 
+                        options: ["icmp", "tcp", "udp"], 
+                        correctAnswer: "tcp" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br><br><b>เหตุผล:</b> ในการใช้งานเครื่องมือ <code>pktmon</code> (Packet Monitor) ของ Windows หากคุณต้องการกรอง (Filter) แพ็กเก็ตที่ระบุเฉพาะไอพีแอดเดรส คำสั่งที่คุณต้องใช้คือ:<br><code>pktmon filter add -i 192.168.0.100 -t TCP --flags SYN</code><br>(โดย <code>-i</code> ย่อมาจาก IP Address ครับ)"
+            },
+            // ==========================================
+            // Question 57 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "multiple_select",
+                question: "Your on-premises datacenter contains a server named Server1 that runs Windows Server.<br>You install the System Insights feature on Server1.<br>You discover that some of the System Insights capabilities are NOT installed.<br><br>Which two capabilities should be installed manually on Server1? Each correct answer presents part of the solution.<br>NOTE: Each correct selection is worth one point.",
+                options: [
+                    "A. CPU capacity forecasting",
+                    "B. Physical disk anomaly detection (IOPS)",
+                    "C. Networking capacity forecasting",
+                    "D. Physical disk anomaly detection (Latency)",
+                    "E. Total storage consumption forecasting"
+                ],
+                correctAnswerIndex: [1, 3], // B and D
+                explanation: "✅ <b>Explanation:</b><br><b>B. Physical disk anomaly detection (IOPS)</b> และ <b>D. Physical disk anomaly detection (Latency)</b> คือคำตอบที่ถูกต้องครับ<br><br><b>เหตุผล:</b> System Insights จะติดตั้งฟีเจอร์กลุ่ม <b>Forecasting (พยากรณ์ล่วงหน้า)</b> มาให้เป็นค่าเริ่มต้น แต่ฟีเจอร์ในกลุ่ม <b>Anomaly detection (ตรวจจับความผิดปกติ)</b> ของดิสก์ เช่น IOPS และ Latency จะเป็นส่วนเสริม (Extension) ที่คุณต้องดาวน์โหลดและติดตั้งเพิ่มเติมเข้าไปเองทีหลังครับ"
+            },
+            // ==========================================
+            // Question 58 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription that uses Azure Monitor.<br>You need to create an alert rule that will generate an alert when an Azure virtual machine is turned off.<br><br>Which type of signal should you use?",
+                options: [
+                    "A. Activity log",
+                    "B. Service health",
+                    "C. Log"
+                ],
+                correctAnswerIndex: 0, // A
+                explanation: "✅ <b>Explanation:</b><br><b>A. Activity log</b> is correct.<br><br><b>เหตุผล:</b> การกระทำใดๆ ก็ตามที่เป็นการ 'เปลี่ยนสถานะ' ของทรัพยากรบน Azure เช่น การเปิด (Start), ปิด (Deallocate), สร้าง (Create) หรือลบ (Delete) VM เหตุการณ์เหล่านี้จะถูกบันทึกไว้ใน <b>Activity log</b> ดังนั้นคุณต้องสร้าง Alert Rule โดยดักจับ Signal จากส่วนนี้ครับ"
+            },
+	        // ==========================================
+            // Question 59 (Topic 5) - Table Updated
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have the resources shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Type</th><th>Description</th></tr>" +
+                          "<tr><td>VNet1</td><td>Azure virtual network</td><td>Contains a subnet named Subnet 1</td></tr>" +
+                          "<tr><td>NSG1</td><td>Network security group (NSG)</td><td>Associated to Subnet1</td></tr>" +
+                          "<tr><td>VM1</td><td>Azure virtual machine</td><td>Connected to Subnet1</td></tr>" +
+                          "<tr><td>Server1</td><td>On-premises server that runs Windows Server</td><td>None</td></tr>" +
+                          "<tr><td>Server2</td><td>On-premises server that runs Windows Server</td><td>Has Windows Admin Center installed</td></tr>" +
+                          "</table><br>" +
+                          "Your on-premises network is connected to VNet1 by using a Site-to-Site VPN.<br>" +
+                          "The network traffic sent from Server1 fails to reach VM1.<br>" +
+                          "You need to review the contents of the network traffic sent from Server1 to VM1.<br><br>" +
+                          "What should you do first?",
+                options: [
+                    "A. From Server1, enable Windows Firewall logs.",
+                    "B. From Windows Admin Center, enable the Packet Monitoring extension.",
+                    "C. From NSG1, enable NSG flow logs.",
+                    "D. From Azure Network Watcher, add a packet capture."
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. From Windows Admin Center, enable the Packet Monitoring extension.</b> is correct.<br><br><b>เหตุผล:</b> โจทย์ต้องการให้คุณ <b>'review the contents of the network traffic'</b> (ดูเนื้อหาลึกเข้าไปถึงในตัวแพ็กเก็ต) ซึ่ง NSG flow logs จะบอกได้แค่ IP ต้นทาง/ปลายทางและพอร์ต (ไม่เห็นเนื้อหา) <br>เนื่องจากปัญหานี้ส่งไปไม่ถึง VM1 และคุณมี Windows Admin Center ใช้งานอยู่บน Server2 ตามข้อมูลในตาราง การเปิด <b>Packet Monitoring extension</b> ใน WAC จึงเป็นวิธีที่ง่ายและตรงจุดที่สุดในการจับแพ็กเก็ตตั้งแต่เครื่องต้นทางครับ"
+            },
+// ==========================================
+            // Question 60 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "Your network contains an Active Directory Domain Services (AD DS) domain named contoso.com. Contoso.com contains a member server named server1.contoso.com.<br>You cannot resolve the FQDN of server1.contoso.com.<br>You verify that Windows Defender Firewall is configured correctly and that you can ping server1.contoso.com successfully by using the server's IP address.<br>You need to validate that the DNS record for server1.contoso.com exists.<br><br>Which command should you run?",
+                options: [
+                    "A. tracert",
+                    "B. ipconfig",
+                    "C. pathping",
+                    "D. nslookup"
+                ],
+                correctAnswerIndex: 3, // D
+                explanation: "✅ <b>Explanation:</b><br><b>D. nslookup</b> is correct.<br><br><b>เหตุผล:</b> เมื่อมีปัญหาการ Resolve ชื่อ FQDN ไม่ได้ แต่ปิง IP ได้ เครื่องมือมาตรฐานที่ใช้สอบถาม (Query) ข้อมูลจาก DNS Server เพื่อเช็คว่ามี Record นั้นอยู่จริงหรือไม่ คือ <code>nslookup</code> ครับ"
+            },
+	        // ==========================================
+            // Question 61 (Topic 5) - รูปแบบแทรก 2 รูป
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "hotspot", // หรือ mcq ตามการตั้งค่าระบบของพี่
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains two servers named Server1 and Server2 that run Windows Server.<br><br>" +
+			  "On Server1, you create an event subscription named Subscription1 that retrieves events from Server2.<br>" +
+                          "The Query Filter settings for Subscription1 are configured as shown below:<br>" +
+                          "" +
+                          "<div style='margin: 15px 0;'>" +
+                          "  <img src='images5/Q61-1.jpg' style='max-width: 50%; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>" +
+                          "</div>" +
+                          "On Server1, you create a custom view named View1 as shown below:<br>" +
+                          "" +
+                          "<div style='margin: 15px 0;'>" +
+                          "  <img src='images5/Q61-2.jpg' style='max-width: 50%; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>" +
+                          "</div>" +
+                          "For each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+                statements: [
+                    { text: "Critical events created in the System log on Server2 are visible in View1.", correctAnswer: "No" },
+                    { text: "Warning events created in the Setup log on Server1 are visible in View1.", correctAnswer: "No" },
+                    { text: "Information events created in the Application log on Server2 are forwarded to Server1.", correctAnswer: "Yes" }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "• <b>Statement 1 (No):</b> ใน Subscription1 ไม่ได้เลือก System log ไว้แต่แรก ทำให้ Event จาก System log ของ Server2 ไม่มีทางถูกส่งมาที่ Server1 ได้เลย<br>" +
+                             "• <b>Statement 2 (No):</b> แม้ใน View1 จะมีการเลือกแสดง Setup log ไว้จริง (ซึ่งปกติถ้าติ๊กถูกที่ Setup ก็จะเห็น Warning) แต่หัวใจสำคัญอยู่ที่ Subscription1 ครับ เพราะ Subscription1 ไม่ได้ดึง Setup log จาก Server1 เข้ามา (หรือต่อให้มองว่าเป็น Log ของ Server1 เอง ตัว View1 ในรูปที่ 2 ก็ ไม่ได้ติ๊กเลือก Setup log ไว้ครับ) จึงทำให้ Warning ใน Setup log ไม่ปรากฏใน View1<br>" +
+                             "• <b>Statement 3 (Yes):</b> ใน Subscription1 (รูปที่ 1) เราได้ติ๊กเลือก Application log และติ๊กเลือก Information level ไว้เรียบร้อยแล้ว ดังนั้น Information events จาก Application log บน Server2 จะถูกส่ง (Forward) เข้ามาเก็บที่ Server1 แน่นอนครับ (แม้ว่ามันจะไม่ไปโผล่ใน View1 ก็ตาม เพราะ View1 ไม่ได้เลือกแสดง Application log ไว้ แต่ตัว Event มันถูกส่งมาถึง Server1 แล้ว)"
+            },            
+	        // ==========================================
+            // Question 62 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription.<br>Your on-premises network connects to Azure by using an Azure VPN gateway named VPN1.<br>You need to monitor the Azure gateway health probe for VPN1.<br><br>Which TCP port should you use?",
+                options: [
+                    "A. 443",
+                    "B. 1723",
+                    "C. 3389",
+                    "D. 8081",
+                    "E. 65500"
+                ],
+                correctAnswerIndex: 3, // D
+                explanation: "✅ <b>Explanation:</b><br><b>D. 8081</b> is correct.<br><br><b>เหตุผล:</b> ในการทำ Health Probe ของ Azure VPN Gateway จะใช้พอร์ต TCP <b>8081</b> เป็นมาตรฐานในการตรวจสอบสถานะการเชื่อมต่อครับ"
+            },
+            // ==========================================
+            // Question 63 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You enable Microsoft Defender for Servers Plan 2 and configure Defender for Servers to monitor for Windows file and registry changes on the virtual machines.<br>You need to query the detected file and registry changes.<br><br>Which table should you query?",
+                options: [
+                    "A. ASimFileEventLogs",
+                    "B. MDCDetectionFimEvents",
+                    "C. ASimRegistryEventLogs",
+                    "D. DeviceRegistryEvents"
+                ],
+                correctAnswerIndex: 1, // B
+                explanation: "✅ <b>Explanation:</b><br><b>B. MDCDetectionFimEvents</b> is correct.<br><br><b>เหตุผล:</b> ข้อมูลที่ถูกตรวจจับโดย File Integrity Monitoring (FIM) ของ Microsoft Defender for Cloud จะถูกจัดเก็บไว้ในตารางมาตรฐานชื่อ <b>MDCDetectionFimEvents</b> ใน Log Analytics workspace ครับ"
+            },
+            // ==========================================
+            // Question 64 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an Azure subscription. The subscription contains a virtual machine named Server1 that runs Windows Server.<br>You create a new Log Analytics workspace named Workspace1.<br>You need to collect performance metrics for Server1 by using Azure Monitor.<br><br>What should you do next?",
+                options: [
+                    "A. Regenerate the secondary key.",
+                    "B. Install the Azure Connected Machine agent.",
+                    "C. Create a data collection rule (DCR).",
+                    "D. Deploy and configure Windows Event Forwarding."
+                ],
+                correctAnswerIndex: 2, // C
+                explanation: "✅ <b>Explanation:</b><br><b>C. Create a data collection rule (DCR).</b> is correct.<br><br><b>เหตุผล:</b> ภายใต้สถาปัตยกรรม Azure Monitor ยุคใหม่ การจะบอกให้ Agent ตัวไหนเก็บข้อมูลอะไร (Performance counters) จะต้องทำผ่าน <b>Data Collection Rule (DCR)</b> เป็นหลักครับ"
+            },
+            // ==========================================
+            // Question 65 (Topic 5)
+            // ==========================================
+            {
+                topic: "Topic 5",
+                type: "mcq",
+                question: "You have an on-premises server named Server1 that runs Windows Server 2025 Standard.<br>You have an Azure subscription that contains the virtual machines show in the following table.<br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Location</th><th>Operating system</th></tr>" +
+                          "<tr><td>VM1</td><td>West US</td><td>Windows Server 2025 Datacenter:Azure Edition</td></tr>" +
+                          "<tr><td>VM2</td><td>Central US</td><td>Windows Server 2022 Datacenter</td></tr>" +
+                          "<tr><td>VM3</td><td>Central US</td><td>Windows Server 2019 Datacenter</td></tr>" +
+                          "</table><br>" +
+			  "the subscription contains a Microsoft Sentinel instance named Sentinel1 in the Central US Azure region.<br>You need to implement the Windows Firewall Events via AMA connector.<br><br>Which servers can send Windows Firewall events to Sentinel1?<br>",
+                options: [
+                    "A. VM1 only",
+                    "B. VM2 only",
+                    "C. VM1 and Server1 only",
+                    "D. VM1, VM2, and VM3 only",
+                    "E. VM1, VM2, and Server1 only",
+                    "F. VM1, VM2, VM3, and Server1"
+                ],
+                correctAnswerIndex: 5, // F
+                explanation: "✅ <b>Explanation:</b><br><b>F. VM1, VM2, VM3, and Server1 (ส่งได้ทุกเครื่องเลยครับ!)</b> is correct.<br><b>เหตุผล:</b><br>" +
+			     "• ตัว Azure Monitor Agent (AMA) รองรับการทำงานบน Windows Server รุ่นเก่าตั้งแต่ 2012 R2, 2016, 2019, 2022 และแน่นอนว่ารวมถึงรุ่นใหม่อย่าง 2025 ด้วยครับ ดังนั้นทั้ง 4 เครื่องจึงสอบผ่านเรื่อง OS แบบฉลุย<br>" +
+			     "• Sentinel1 อยู่ใน Central US ในขณะที่ VM1 อยู่ใน West US แต่ในทางสถาปัตยกรรมของ Azure แล้ว Log Analytics Workspace (ซึ่งเป็นฐานของ Sentinel) สามารถรับ Log จาก VM ที่อยู่คนละ Region ได้อย่างไร้ปัญหาครับ (แค่อาจจะมีค่าใช้จ่ายเรื่อง Data transfer ข้ามภูมิภาคนิดหน่อย แต่ในเชิงเทคนิคคือทำงานได้ 100%)<br>" +
+			     "• Server1 เป็นเครื่อง On-premises หลายคนอาจจะคิดว่าส่งไม่ได้ แต่ในยุคของ AMA เราสามารถทำได้สบายมากครับ โดยการติดตั้ง Azure Arc (Azure Connected Machine agent) ลงไปที่ Server1 ก่อน จากนั้น Azure จะมองเห็นมันและสามารถสั่ง Deploy ตัว AMA เพื่อส่ง Log ขึ้น Sentinel ได้เหมือนกับเป็น VM บน Azure เลยครับ<br>"
+            }
+        ];
+
+        // ==========================================
+        // 🚨 ตั้งค่าเลขข้อเริ่มต้นของไฟล์นี้
+        // ==========================================
+        const STARTING_QUESTION_NUMBER = 31; 
+
+        let currentQuestion = 0; 
+        let score = 0; 
+        let questionStates = []; 
+
+        // คำนวณ Topic และเลขข้อ
+        function getQuestionInfo(globalIndex) {
+            if(quizData.length === 0) return { topicName: "Topic", questionNumber: STARTING_QUESTION_NUMBER };
+            
+            let firstTopicOfFile = quizData[0].topic || "Topic 5"; 
+            let topic = firstTopicOfFile; 
+            let localNum = STARTING_QUESTION_NUMBER; 
+
+            for (let i = 1; i <= globalIndex; i++) {
+                if (quizData[i].topic && quizData[i].topic !== topic) {
+                    topic = quizData[i].topic; 
+                    localNum = 1;              
+                } else {
+                    localNum++;                
+                }
+            }
+            return { topicName: topic, questionNumber: localNum };
+        }
+
+        // วาดแผงปุ่มด้านบน
+        function drawNavigationGrid() {
+            const navGrid = document.getElementById('navigation-grid');
+            navGrid.innerHTML = '';
+            
+            let currentTopicName = "";
+            let currentTopicGroup = null;
+            let localNum = 1;
+            const firstTopicOfFile = quizData[0].topic || "Topic 1";
+
+            quizData.forEach((q, index) => {
+                let thisTopic = q.topic ? q.topic : currentTopicName;
+                if (!thisTopic) thisTopic = "Topic 1"; 
+
+                if (thisTopic !== currentTopicName) {
+                    currentTopicName = thisTopic;
+                    
+                    if (currentTopicName === firstTopicOfFile) {
+                        localNum = STARTING_QUESTION_NUMBER;
+                    } else {
+                        localNum = 1;
+                    }
+                    
+                    const topicHeader = document.createElement('div');
+                    topicHeader.style.width = '100%';
+                    topicHeader.style.fontWeight = 'bold';
+                    topicHeader.style.marginTop = index === 0 ? '0px' : '15px';
+                    topicHeader.style.marginBottom = '8px';
+                    topicHeader.style.color = '#0078d4';
+                    topicHeader.style.borderBottom = '1px solid #ccc';
+                    topicHeader.innerText = currentTopicName;
+                    navGrid.appendChild(topicHeader);
+                    
+                    currentTopicGroup = document.createElement('div');
+                    currentTopicGroup.style.display = 'flex';
+                    currentTopicGroup.style.flexWrap = 'wrap';
+                    currentTopicGroup.style.gap = '8px';
+                    currentTopicGroup.style.width = '100%';
+                    navGrid.appendChild(currentTopicGroup);
+                }
+
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.innerText = localNum; 
+                
+                if (index === currentQuestion) btn.classList.add('active');
+                else if (questionStates[index] === true) btn.classList.add('answered-correct');
+                else if (questionStates[index] === false) btn.classList.add('answered-wrong');
+                
+                btn.onclick = () => jumpToQuestion(index);
+                currentTopicGroup.appendChild(btn);
+                
+                localNum++;
+            });
+        }
+
+        function jumpToQuestion(index) {
+            currentQuestion = index;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if(questionStates.length === 0) questionStates = new Array(quizData.length).fill(null);
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('prev-btn').disabled = (currentQuestion === 0); 
+            
+            drawNavigationGrid(); 
+
+            const q = quizData[currentQuestion];
+            const info = getQuestionInfo(currentQuestion);
+            
+            document.getElementById('question-counter').innerText = `${info.topicName} - Question: ${info.questionNumber}`;
+            
+            let topicHtml = `<div style='font-size: 1.1em; color: #d9534f; margin-bottom: 15px; font-weight: bold; padding-bottom: 5px; border-bottom: 2px dashed #ccc;'>📌 ${info.topicName}</div>`;
+            document.getElementById('question-text').innerHTML = `${topicHtml}<div class="question-badge">Question ${info.questionNumber}</div><br>${q.question}`;
+            
+            const mcqContainer = document.getElementById('options-container');
+            const ddContainer = document.getElementById('dragdrop-container');
+            const hsContainer = document.getElementById('hotspot-container');
+            const dropdownContainer = document.getElementById('dropdown-container');
+            
+            mcqContainer.style.display = "none"; ddContainer.style.display = "none"; hsContainer.style.display = "none"; dropdownContainer.style.display = "none";
+
+            if (!q.type || q.type === "mcq" || q.type === "multiple_select") {
+                mcqContainer.style.display = "block"; mcqContainer.innerHTML = '';
+                let inputType = (q.type === "multiple_select") ? "checkbox" : "radio";
+                q.options.forEach((opt, index) => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `<input type="${inputType}" name="option" value="${index}"> <span style="margin-left:10px;">${opt}</span>`;
+                    mcqContainer.appendChild(label);
+                });
+            } 
+            else if (q.type === "dragdrop") {
+                ddContainer.style.display = "flex";
+                const sourceBox = document.getElementById('source-box'); 
+                const targetsWrapper = document.getElementById('targets-wrapper');
+                
+                sourceBox.innerHTML = '<h4>Options</h4>';
+                targetsWrapper.innerHTML = ''; 
+
+                q.draggables.forEach((itemText, index) => {
+                    const div = document.createElement('div'); div.className = 'draggable'; div.id = `drag-${index}`; div.draggable = true; div.ondragstart = drag; div.innerText = itemText; sourceBox.appendChild(div);
+                });
+
+                if (q.targets) {
+                    q.targets.forEach((target, index) => {
+                        targetsWrapper.innerHTML += `<div class="target-area" id="target-box-${index}" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="target-label">${target.label}</div></div>`;
+                    });
+                } else {
+                    targetsWrapper.innerHTML = `<div class="target-area" id="target-box-0" ondrop="drop(event)" ondragover="allowDrop(event)" style="flex:1;"><div class="target-label">Answer Area (Drop here in order)</div></div>`;
+                }
+            }
+            else if (q.type === "hotspot") {
+                hsContainer.style.display = "block";
+                let html = `<table class="hotspot-table"><tr><th>Statements</th><th>Yes</th><th>No</th></tr>`;
+                q.statements.forEach((stmt, index) => {
+                    html += `<tr id="hs-row-${index}">
+                        <td>${stmt.text}</td>
+                        <td onclick="document.getElementById('yes-${index}').checked = true;"><input type="radio" id="yes-${index}" name="hs-${index}" value="Yes"></td>
+                        <td onclick="document.getElementById('no-${index}').checked = true;"><input type="radio" id="no-${index}" name="hs-${index}" value="No"></td>
+                    </tr>`;
+                });
+                html += `</table>`; hsContainer.innerHTML = html;
+            }
+            else if (q.type === "dropdown" || q.type === "inline_dropdown") {
+                dropdownContainer.style.display = "block";
+                let html = '<div class="dd-area" style="text-align:left; overflow-x:auto;"><h3>Answer Area</h3><br>';
+                
+                if (q.type === "inline_dropdown") {
+                    let template = q.inlineTemplate;
+                    q.dropdowns.forEach((dd, index) => {
+                        let selectHtml = `<select id="sel-${index}" class="dd-select" style="width:auto; display:inline-block; margin: 0 5px; font-family:sans-serif; font-size:1em; padding: 5px;"><option value="">-- Select --</option>`;
+                        dd.options.forEach(opt => { selectHtml += `<option value="${opt}">${opt}</option>`; });
+                        selectHtml += `</select>`;
+                        template = template.replace(`[DD${index}]`, selectHtml);
+                    });
+                    html += `<div style="font-family: monospace; font-size: 1.1em; white-space: normal; word-wrap: break-word; padding: 15px; background: white; border: 1px solid #ccc; border-radius: 5px;">${template}</div>`;
+                } else {
+                    q.dropdowns.forEach((dd, index) => {
+                        html += `<div class="dd-row"><div class="dd-label">${dd.label}</div><select id="sel-${index}" class="dd-select"><option value="">-- Select --</option>`;
+                        dd.options.forEach(opt => { html += `<option value="${opt}">${opt}</option>`; });
+                        html += `</select></div>`;
+                    });
+                }
+                html += '</div>'; dropdownContainer.innerHTML = html;
+            }
+
+            if (questionStates[currentQuestion] !== null) {
+                showPastAnswerFeedback();
+            }
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault(); 
+            if(questionStates[currentQuestion] !== null) return;
+            const data = ev.dataTransfer.getData("text"); 
+            const draggedElement = document.getElementById(data);
+            
+            let dropZone = ev.target.closest('.target-area') || ev.target.closest('.dd-box');
+            if (dropZone) dropZone.appendChild(draggedElement);
+        }
+
+        function checkAnswer() {
+            if(questionStates[currentQuestion] !== null) return;
+            const q = quizData[currentQuestion];
+            let isCorrect = false;
+
+            if (!q.type || q.type === "mcq") {
+                const selectedOption = document.querySelector('input[name="option"]:checked');
+                if (!selectedOption) { alert('Please select an answer!'); return; }
+                isCorrect = (parseInt(selectedOption.value) === q.correctAnswerIndex);
+            } 
+            else if (q.type === "multiple_select") {
+                const selectedOptions = document.querySelectorAll('input[name="option"]:checked');
+                if (selectedOptions.length === 0) { alert('Please select your answers!'); return; }
+                const userAnswers = Array.from(selectedOptions).map(opt => parseInt(opt.value)).sort();
+                const correctAnswers = [...q.correctAnswerIndex].sort();
+                isCorrect = JSON.stringify(userAnswers) === JSON.stringify(correctAnswers);
+            }
+            else if (q.type === "dragdrop") {
+                if (q.targets) {
+                    let allCorrect = true;
+                    q.targets.forEach((target, index) => {
+                        const targetBox = document.getElementById(`target-box-${index}`);
+                        const items = Array.from(targetBox.querySelectorAll('.draggable')).map(el => el.innerText.trim());
+                        if (JSON.stringify(items.sort()) !== JSON.stringify(target.expected.sort())) allCorrect = false;
+                    });
+                    isCorrect = allCorrect;
+                } else {
+                    const targetItems = document.getElementById('target-box-0').querySelectorAll('.draggable');
+                    const userAnswers = Array.from(targetItems).map(el => el.innerText.trim());
+                    if (userAnswers.length === 0) { alert('Please drag answers to the area!'); return; }
+                    isCorrect = JSON.stringify(userAnswers) === JSON.stringify(q.correctOrder);
+                }
+            }
+            else if (q.type === "hotspot") {
+                let correctCount = 0; let answeredCount = 0;
+                q.statements.forEach((stmt, index) => {
+                    const selected = document.querySelector(`input[name="hs-${index}"]:checked`);
+                    if (selected) { answeredCount++; if (selected.value === stmt.correctAnswer) correctCount++; }
+                });
+                if (answeredCount < q.statements.length) { alert('Please answer all statements!'); return; }
+                isCorrect = (correctCount === q.statements.length);
+            }
+            else if (q.type === "dropdown" || q.type === "inline_dropdown") {
+                let correctCount = 0; let answeredCount = 0;
+                q.dropdowns.forEach((dd, index) => {
+                    const sel = document.getElementById(`sel-${index}`);
+                    if (sel.value !== "") answeredCount++;
+                    if (sel.value === dd.correctAnswer) correctCount++;
+                });
+                if (answeredCount < q.dropdowns.length) { alert('Please select options for all dropdowns!'); return; }
+                isCorrect = (correctCount === q.dropdowns.length);
+            }
+
+            questionStates[currentQuestion] = isCorrect;
+            if (isCorrect) score++;
+
+            document.getElementById('score-counter').innerText = `Score: ${score}`;
+            showPastAnswerFeedback();
+            drawNavigationGrid(); 
+        }
+
+        function showPastAnswerFeedback() {
+            const q = quizData[currentQuestion];
+            const expBox = document.getElementById('explanation-box');
+            if (questionStates[currentQuestion]) {
+                expBox.className = 'explanation correct-box'; expBox.innerHTML = "<h4>Correct! 🎉</h4>" + q.explanation;
+            } else {
+                expBox.className = 'explanation incorrect-box'; expBox.innerHTML = "<h4>Incorrect / Reviewed</h4>" + q.explanation;
+            }
+            expBox.style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; loadQuestion(); } }
+        function nextQuestion() { 
+            if (currentQuestion < quizData.length - 1) { currentQuestion++; loadQuestion(); } 
+            else { alert(`End of Exam! Total Score: ${score} / ${quizData.length}`); }
+        }
+
+        window.onload = loadQuestion;
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,1111 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Simulator V5 (Part 1: Q1-30)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; max-width: 850px; margin: 0 auto; padding: 20px; line-height: 1.6;}
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .status-bar { display: flex; justify-content: space-between; margin-bottom: 20px; color: #222; font-weight: bold; font-size: 1.2em; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;}
+        .question-badge { background-color: #0078d4; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+        .question { font-size: 1.1em; margin-bottom: 20px;}
+        
+        /* แผงปุ่มกดข้ามข้อ (Navigation Grid) */
+        .nav-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; padding: 10px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; justify-content: center; }
+        .nav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background: white; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95em;}
+        .nav-btn:hover { background: #f0f0f0; border-color: #0078d4; }
+        .nav-btn.active { background: #0078d4; color: white; border-color: #0078d4; box-shadow: 0 2px 5px rgba(0,120,212,0.4); }
+        .nav-btn.answered-correct { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .nav-btn.answered-wrong { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+        /* สไตล์ตารางโจทย์ทั่วไป */
+        .info-table { width: auto; min-width: 50%; max-width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95em; }
+        .info-table th, .info-table td { border: 1px solid #aaa; padding: 8px; }
+        .info-table th { background: #e9ecef; text-align: left; }
+
+        /* ตัวเลือก MCQ (Radio และ Checkbox) */
+        .options label { display: block; padding: 15px; margin: 10px 0; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; cursor: pointer; transition: 0.2s;}
+        .options label:hover { background: #e2e6ea; }
+        input[type="radio"], input[type="checkbox"] { transform: scale(1.2); cursor: pointer; margin-right: 8px;}
+        
+        /* สไตล์ Drag & Drop (รองรับหลายกล่อง) */
+        .dd-wrapper { display: flex; gap: 20px; margin-top: 15px; align-items: flex-start; }
+        .dd-box { flex: 1; padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #fafafa; min-height: 200px; }
+        .dd-box h4 { margin-top: 0; color: #555; text-align: center; margin-bottom: 15px;}
+        .draggable { background: #0078d4; color: white; padding: 12px; margin-bottom: 10px; border-radius: 5px; cursor: grab; text-align: left; font-weight: 500; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+        .draggable:active { cursor: grabbing; }
+        
+        /* กล่องเป้าหมายสำหรับลากวาง */
+        .target-container { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .target-area { padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #f0f8ff; min-height: 100px; }
+        .target-label { font-weight: bold; margin-bottom: 10px; color: #333; text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
+
+        /* สไตล์ Hotspot (ตาราง Yes/No) */
+        .hotspot-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        .hotspot-table th, .hotspot-table td { border: 1px solid #ccc; padding: 12px; }
+        .hotspot-table th { background: #0078d4; color: white; text-align: center; font-weight: bold; }
+        .hotspot-table td:first-child { width: 70%; font-weight: 500; }
+        .hotspot-table td:not(:first-child) { text-align: center; width: 15%; background: #f8f9fa; cursor: pointer;}
+
+        /* สไตล์ Dropdown */
+        .dd-area { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin-top: 15px; text-align: left; display: block; width: auto; overflow-x: auto}
+        .dd-row { margin-bottom: 10px; display: flex; align-items: center; flex-wrap: nowrap;}
+        .dd-label { width: 200px; text-align: right; margin-right: 15px; font-weight: bold; }
+        .dd-select { padding: 5px; font-size: 1em; width: auto; max-width: 170px; border: 1px solid #ccc; border-radius: 4px; }
+
+        /* ปุ่มและเฉลย */
+        .button-group { display: flex; justify-content: space-between; margin-top: 25px; }
+        .btn { background: #0078d4; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: bold;}
+        .btn:hover { background: #005a9e; }
+        .btn-secondary { background: #6c757d; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .explanation { margin-top: 25px; padding: 20px; border-radius: 5px; display: none; }
+        .correct-box { background: #d4edda; border-left: 5px solid #28a745; color: #155724; }
+        .incorrect-box { background: #f8d7da; border-left: 5px solid #dc3545; color: #721c24; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="navigation-grid" class="nav-grid"></div>
+
+        <div class="status-bar">
+            <span id="question-counter">Question: 1</span>
+            <span id="score-counter">Score: 0</span>
+        </div>
+        
+        <div id="question-text" class="question">Loading...</div>
+        
+        <div id="options-container" class="options" style="display: none;"></div>
+        
+        <div id="dragdrop-container" class="dd-wrapper" style="display: none;">
+            <div class="dd-box" id="source-box" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h4>Options</h4>
+            </div>
+            <div id="targets-wrapper" class="target-container"></div>
+        </div>
+
+        <div id="hotspot-container" style="display: none;"></div>
+        <div id="dropdown-container" style="display: none;"></div>
+        
+<div class="button-group">
+
+    <div>
+        <button class="btn btn-secondary"
+            onclick="window.location.href='../index.html'">
+            🏠 Main Menu
+        </button>
+
+        <button class="btn btn-secondary"
+            id="prev-btn"
+            onclick="prevQuestion()">
+            &laquo; Back
+        </button>
+    </div>
+
+    <div>
+        <button class="btn" id="submit-btn"
+            onclick="checkAnswer()">
+            Submit Answer
+        </button>
+
+        <button class="btn"
+            id="next-btn"
+            onclick="nextQuestion()"
+            style="display:none;background:#28a745;">
+            Next Question &raquo;
+        </button>
+    </div>
+
+</div>        
+        <div id="explanation-box" class="explanation"></div>
+    </div>
+
+    <script>
+        const quizData = [
+            // ==========================================
+            // Question 1
+            // ==========================================
+            {
+                topic: "Topic 1",
+                question: "You have a server named Server1 that runs Windows Server. You need to ensure that only specific applications can modify the data in protected folders on Server1. <br><br><b>Solution:</b> From Virus & threat protection, you configure Controlled folder access.<br> Does this meet the goal?",
+                options: ["A. Yes", "B. No"],
+                correctAnswerIndex: 0,
+                explanation: "✅ ตอบ A. Yes: Controlled folder access ถูกออกแบบมาเพื่อป้องกัน Ransomware อนุญาตเฉพาะแอปที่ Whitelisted"
+            },
+            // ==========================================
+            // Question 2
+            // ==========================================
+            {
+                question: "You have a server named Server1 that runs Windows Server. You need to ensure that only specific applications can modify the data in protected folders on Server1. <br><br><b>Solution:</b> From Virus & threat protection, you configure Tamper Protection. <br>Does this meet the goal?",
+                options: ["A. Yes", "B. No"],
+                correctAnswerIndex: 1,
+                explanation: "✅ ตอบ B. No: Tamper Protection มีไว้ปกป้องตัวโปรแกรมแอนตี้ไวรัสเอง ไม่ได้ปกป้องข้อมูลในโฟลเดอร์<br>ป้องกันแอปเข้าถึงโฟลเดอร์ = Controlled folder access / ป้องกันไวรัสมาปิดแอนตี้ไวรัส = Tamper Protection"
+
+            },
+            // ==========================================
+            // Question 3
+            // ==========================================
+            {
+                question: "You have a server named Server1 that runs Windows Server. You need to ensure that only specific applications can modify the data in protected folders on Server1. <br><br><b>Solution:</b> From App & browser control, you configure the Exploit protection settings. <br>Does this meet the goal?",
+                options: ["A. Yes", "B. No"],
+                correctAnswerIndex: 1,
+                explanation: "✅ ตอบ B. No: Exploit protection ไม่ได้มีไว้ป้องกันการแก้ไขไฟล์ในโฟลเดอร์ <br>เป็นฟีเจอร์ด้านความปลอดภัยที่ออกแบบมาเพื่อ ป้องกันแอปพลิเคชันต่างๆ จากการถูกโจมตีผ่านช่องโหว่ (Vulnerabilities) เช่น การป้องกันระดับหน่วยความจำ (Memory mitigations), DEP, หรือ ASLR เพื่อไม่ให้แฮกเกอร์ใช้เทคนิคเจาะระบบเข้ามาควบคุมแอปพลิเคชันได้ "
+            },
+            // ==========================================
+            // Question 4 (Drag & Drop)
+            // ==========================================
+            {
+                type: "dragdrop",
+                question: "DRAG DROP - You have an on-premises Active Directory Domain Services (AD DS) domain that syncs with an Azure Active Directory (Azure AD) tenant. The AD DS domain contains a domain controller named DC1. DC1 does NOT have internet access. You need to configure password security for on-premises users to prevent them from using known weak passwords and the company name in passwords. <br><br><b>Drag the appropriate configurations to the correct targets:</b>",
+                draggables: [
+                    "Configure Azure AD Identity Protection",
+                    "Configure Azure AD Password Protection",
+                    "Install the Azure AD Pass-through Authentication Agent",
+                    "Install the Azure AD Password Protection DC agent",
+                    "Install the Azure AD Password Protection proxy service"
+                ],
+                targets: [
+                    { 
+                        label: "Target 1: On DC1", 
+                        expected: ["Install the Azure AD Password Protection DC agent"] 
+                    },
+                    { 
+                        label: "Target 2: On a member server", 
+                        expected: ["Install the Azure AD Password Protection proxy service"] 
+                    },
+                    { 
+                        label: "Target 3: In Azure", 
+                        expected: ["Configure Azure AD Password Protection"] 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>1. <b>On DC1:</b> Install the <i>Azure AD Password Protection DC agent</i>.<br>2. <b>On a member server:</b> Install the <i>proxy service</i> since DC1 doesn't have internet access.<br>3. <b>In Azure:</b> <i>Configure Azure AD Password Protection</i>."
+            },
+            // ==========================================
+            // Question 5 (HOTSPOT Matrix - แยก 3 รูป พร้อมหัวข้อ)
+            // ==========================================
+            {
+                type: "hotspot",
+                question:
+                          
+                          "" +
+                          "<div style='border: 1px solid #ccc; padding: 10px; background: #fff; border-radius: 5px; margin-bottom: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>" +
+                          "  <div style='/*font-weight: bold; margin-bottom: 10px;*/ color: #333; text-align: left; border-bottom: 1px solid #eee; padding-bottom: 5px;'>The Default Domain Policy Group Policy Object (GPO) is shown in the GPO exhibit.</div>" +
+                          "  <img src='images1/Q5-1.jpg' style='width: 100%; max-width: 600px; border: 1px solid #eee; border-radius: 3px;'>" +
+                          "</div>" +
+
+                          "" +
+                          "<div style='border: 1px solid #ccc; padding: 10px; background: #fff; border-radius: 5px; margin-bottom: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>" +
+                          "  <div style='/*font-weight: bold; margin-bottom: 10px;*/ color: #333; text-align: left; border-bottom: 1px solid #eee; padding-bottom: 5px;'>The members of a group named Service Accounts are shown in the Group exhibit.</div>" +
+                          "  <img src='images1/Q5-2.jpg' style='width: 50%; max-width: 600px; border: 1px solid #eee; border-radius: 3px;'>" +
+                          "</div>" +
+
+                          "" +
+                          "<div style='border: 1px solid #ccc; padding: 10px; background: #fff; border-radius: 5px; margin-bottom: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>" +
+                          "  <div style='/*font-weight: bold; margin-bottom: 10px;*/ color: #333; text-align: left; border-bottom: 1px solid #eee; padding-bottom: 5px;'>An organizational unit (OU) named ServiceAccounts is shown in the OU exhibit.</div>" +
+                          "  <img src='images1/Q5-3.jpg' style='width: 100%; max-width: 600px; border: 1px solid #eee; border-radius: 3px;'>" +
+                          "</div>" +
+
+                          "" +
+                          "<div style='border: 1px solid #ccc; padding: 10px; background: #fff; border-radius: 5px; margin-bottom: 25px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>" +
+                          "  <div style='/*font-weight: bold; margin-bottom: 10px;*/ color: #333; text-align: left; border-bottom: 1px solid #eee; padding-bottom: 5px;'>You create a Password Settings Object (PSO) as shown in the PSO exhibit.</div>" +
+                          "  <img src='images1/Q5-4.jpg' style='width: 100%; max-width: 600px; border: 1px solid #eee; border-radius: 3px;'>" +
+                          "</div>" +
+		"For each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+                statements: [
+                    { text: "The password of ServiceAccount1 must be at least 16 characters long.", correctAnswer: "Yes" },
+                    { text: "The password of ServiceAccount2 must be at least 16 characters long.", correctAnswer: "No" },
+                    { text: "Accounts that have the Service Accounts Policy applied can change their password to P@$$w0rd1.", correctAnswer: "No" }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "1. <b>Yes:</b> ServiceAccount1 is a member of the 'ServiceAccounts' group. The PSO is applied directly to this group and enforces a minimum password length of 16 characters.<br>" +
+                             "2. <b>No:</b> ServiceAccount2 is in the 'ServiceAccounts' OU, but NOT a member of the 'ServiceAccounts' security group. PSOs apply to users or groups, not OUs.<br>" +
+                             "3. <b>No:</b> The PSO enforces a minimum password length of 16 characters. The password 'P@$$w0rd1' is only 10 characters long, so it will be rejected."
+            },
+            // ==========================================
+            // Question 6 
+            // ==========================================
+            {
+                type: "dragdrop",
+                question: "DRAG DROP - <br>Your network contains an Active Directory Domain Services (AD DS) domain.<br>You need to implement a solution that meets the following requirements:<br> - Ensures that the members of the Domain Admins group are allowed to sign in <b>only to domain controllers</b>.<br> - Ensures that the lifetime of Kerberos Ticket Granting Ticket (TGT) for the members of the Domain Admins group is <b>limited to one hour</b>.<br><br>Which three actions should you perform in sequence? Drag the appropriate actions from the list to the Answer Area and arrange them in the correct order.",
+                draggables: [
+                    "Create a Dynamic Access Control central access policy.",
+                    "Configure the Kerberos Policy settings for the Default Domain Policy Group Policy Object (GPO).",
+                    "Create a Dynamic Access Control claim type.",
+                    "Create an authentication policy.",
+                    "Assign the authentication policy silo to user and computer accounts.",
+                    "Create an authentication policy silo."
+                ],
+                correctOrder: [
+                    "Create an authentication policy.",
+                    "Create an authentication policy silo.",
+                    "Assign the authentication policy silo to user and computer accounts."
+                ],
+                explanation: "✅ <b>Explanation:</b><br>1. Create an authentication policy.(สร้างกฎลดเวลาตั๋ว + ตั้งเงื่อนไขบังคับใช้แค่เครื่อง DC)<br>2. Create an authentication policy silo.(สร้างกล่องไซโลสำหรับกักบริเวณ)<br>3. Assign the authentication policy silo to user and computer accounts.(นำบัญชีแอดมินและเซิร์ฟเวอร์ใส่ลงไปในกล่องไซโล)"
+            },
+            // ==========================================
+            // Question 7
+            // ==========================================
+            {
+                question: "You have an Azure virtual machine named VM1 that runs Windows Server.<br>You plan to deploy a new line-of-business (LOB) application to VM1.<br>You need to ensure that the application can create child processes.<br><br>What should you configure on VM1?",
+                options: [
+                    "A. Microsoft Defender Credential Guard",
+                    "B. Microsoft Defender Application Control",
+                    "C. Microsoft Defender SmartScreen",
+                    "D. Exploit protection"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "✅ <b>Explanation:</b><br><b>D. Exploit protection</b> is correct. It contains settings to enable or disable child process creation.<br>Exploit protection เป็นฟีเจอร์ที่อยู่ในหน้า App & browser control ทำหน้าที่ป้องกันแอปพลิเคชันจากการถูกโจมตีผ่านช่องโหว่ต่างๆ โดยมันจะมีเมนูย่อยระดับ Program settings ให้เราเข้าไปควบคุมพฤติกรรมเชิงลึกได้ และหนึ่งในค่าที่เราสามารถเปิด/ปิดได้คือ Do not allow child processes (ห้ามสร้างโพรเซสลูก)"
+            },
+            // ==========================================
+            // Question 8 
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain named contoso.com. The domain contains the organizational units (OUs) shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Contents</th></tr>" +
+                          "<tr><td><b>Domain Controllers</b></td><td>All the domain controllers in the domain</td></tr>" +
+                          "<tr><td><b>Domain Servers</b></td><td>All the servers that run Windows Server in the domain</td></tr>" +
+                          "<tr><td><b>Domain Client Computers</b></td><td>All the client computers that run Windows 10 in the domain</td></tr>" +
+                          "<tr><td><b>Domain Users</b></td><td>All the users in the domain</td></tr>" +
+                          "</table>" +
+                          "In the domain, you create the Group Policy Objects (GPOs) shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>IPsec setting</th></tr>" +
+                          "<tr><td><b>GPO1</b></td><td><b>Require</b> authentication by using Kerberos V5 for inbound connections</td></tr>" +
+                          "<tr><td><b>GPO2</b></td><td><b>Request</b> authentication by using Kerberos V5 for inbound connections</td></tr>" +
+                          "<tr><td><b>GPO3</b></td><td><b>Require</b> authentication by using X.509 certificates for inbound connections</td></tr>" +
+                          "<tr><td><b>GPO4</b></td><td><b>Request</b> authentication by using X.509 certificates for inbound connections</td></tr>" +
+                          "</table>" +
+                          "You need to implement IPsec authentication to ensure that <b>only authenticated computer accounts can connect to the members in the domain</b>. The solution must <b>minimize administrative effort</b>.<br><br>Which GPOs should you apply to the Domain Controllers OU and the Domain Servers OU? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { id: "dd-0", label: "Domain Controllers:", options: ["GPO1", "GPO2", "GPO3", "GPO4"], correctAnswer: "GPO2" },
+                    { id: "dd-1", label: "Domain Servers:", options: ["GPO1", "GPO2", "GPO3", "GPO4"], correctAnswer: "GPO1" }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>Domain Servers = GPO1 (Require).<br>Domain Controllers = GPO2 (Request)<br>ทำ IPsec ใน AD ให้เหนื่อยน้อยสุด ➡️ ใช้ Kerberos เสมอ (ตัด X.509 ทิ้ง) ➡️ DC ต้องใช้ Request (กันปัญหาไก่กับไข่ตอนขอตั๋ว) ➡️ Server อื่นๆ ต้องใช้ Require (เพื่อบล็อกคนไม่มีตั๋ว)"
+            },
+            // ==========================================
+            // Question 9
+            // ==========================================
+            {
+                question: "You have 100 Azure virtual machines that run Windows Server. The virtual machines are onboarded to Microsoft Defender for Cloud.<br><br>You need to shut down a virtual machine automatically if Microsoft Defender for Cloud generates the 'Antimalware disabled in the virtual machine' alert for the virtual machine.<br><br>What should you use in Microsoft Defender for Cloud?",
+                options: [
+                    "A. A logic app",
+                    "B. A workbook",
+                    "C. A security policy",
+                    "D. Adaptive network hardening"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "✅ <b>Explanation:</b><br><b>A. A logic app</b> is correct.br>Defender แจ้งเตือน ➡️ สั่ง Action อัตโนมัติ (ปิดเครื่อง/ส่งเมล) ➡️ ต้องไปตั้ง Workflow automation ➡️ ซึ่งทำงานอยู่บน Logic App!"
+            },
+            // ==========================================
+            // Question 10
+            // ==========================================
+            {
+                question: "You have a Microsoft Sentinel deployment and 100 Azure Arc-enabled on-premises servers.<br>All the Azure Arc-enabled resources are in the same resource group.<br><br>You need to onboard the servers to Microsoft Sentinel. The solution must minimize administrative effort.<br><br>What should you use to onboard the servers to Microsoft Sentinel?",
+                options: [
+                    "A. Azure Automation",
+                    "B. Azure Policy",
+                    "C. Azure virtual machine extensions",
+                    "D. Microsoft Defender for Cloud"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "✅ <b>Explanation:</b><br><b>B. Azure Policy</b> is correct. It minimizes administrative effort for many resources.<br>Onboard เซิร์ฟเวอร์จำนวนมาก (Azure Arc / VM) เข้า Sentinel/Log Analytics ➡️ ลดภาระแอดมิน (Minimize effort) ➡️ ห้ามกดลง Extension เอง ➡️ ต้องใช้ Azure Policy โยนกฎลง Resource Group ให้มันทำอัตโนมัติ!"
+            },
+            // ==========================================
+            // Question 11
+            // ==========================================
+            {
+                question: "You have an on-premises Active Directory Domain Services (AD DS) domain that syncs with an Azure Active Directory (Azure AD) tenant by using password hash synchronization.<br>You have a Microsoft 365 subscription.<br>All devices are hybrid Azure AD-joined.<br><br>Users report that they must enter their password manually when accessing Microsoft 365 applications.<br>You need to reduce the number of times the users are prompted for their password when they access Microsoft 365 and Azure services.<br><br>What should you do?",
+                options: [
+                    "A. In Azure AD, configure a Conditional Access policy for the Microsoft Office 365 applications.",
+                    "B. In the DNS zone of the AD DS domain, create an autodiscover record.",
+                    "C. From Azure AD Connect, enable single sign-on (SSO).",
+                    "D. From Azure AD Connect, configure pass-through authentication."
+                ],
+                correctAnswerIndex: 2,
+                explanation: "✅ <b>Explanation:</b><br><b>C. From Azure AD Connect, enable single sign-on (SSO)</b> is correct.<br>เครื่อง Hybrid ➡️ ใช้ PHS ซิงก์อยู่แล้ว ➡️ User บ่นต้องพิมพ์รหัสซ้ำ ➡️ แก้ด้วยการเปิด Seamless SSO ในหน้า Azure AD Connect!"
+            },
+            // ==========================================
+            // Question 12
+            // ==========================================
+            {
+                question: "You have an Azure subscription that has Microsoft Defender for Cloud enabled.<br>You have 50 Azure virtual machines that run Windows Server.<br>You need to ensure that any security exploits detected on the virtual machines are forwarded to Defender for Cloud.<br><br>Which extension should you enable on the virtual machines?",
+                options: [
+                    "A. Vulnerability assessment for machines",
+                    "B. Microsoft Dependency agent",
+                    "C. Log Analytics agent for Azure VMs",
+                    "D. Guest Configuration agent"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "✅ <b>Explanation:</b><br><b>C. Log Analytics agent for Azure VMs</b> is correct.<br>ส่ง Security Log/Exploits ขึ้น Defender ➡️ ต้องมีคนส่งข้อมูลให้ ➡️ ตอบ Log Analytics agent เสมอ!<br><b>หมายเหตุ:</b>สำหรับความรู้หน้างานจริง: ปัจจุบัน Microsoft กำลังทยอยบังคับให้ย้ายไปใช้ Azure Monitor Agent (AMA) แทน Log Analytics agent แล้วนะครับ แต่ในบริบทของข้อสอบที่ยังไม่อัปเดตชอยส์นี้ ให้ตอบข้อ C. ไปก่อนครับ"
+            },
+            // ==========================================
+            // Question 13 
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) forest. The forest contains the domains shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Domain controller</th><th>Configuration</th></tr>" +
+                          "<tr><td rowspan='3'><b>fabrikam.com</b></td><td>DC1</td><td>PDC emulator</td></tr>" +
+                          "<tr><td>DC2</td><td>Infrastructure master</td></tr>" +
+                          "<tr><td>DC3</td><td>Read-only domain controller (RODC)</td></tr>" +
+                          "<tr><td rowspan='3'><b>eu.fabrikam.com</b></td><td>DC4</td><td>PDC emulator</td></tr>" +
+                          "<tr><td>DC5</td><td>Infrastructure master</td></tr>" +
+                          "<tr><td>DC6</td><td>Read-only domain controller (RODC)</td></tr>" +
+                          "</table><br>" +
+                          "You are implementing Microsoft Defender for Identity sensors.<br>" +
+                          "You need to install the sensors on the minimum number of domain controllers. The solution must ensure that Defender for Identity will detect all the security risks in both the domains.<br><br>" +
+                          "What should you identify? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "dd-0", 
+                        label: "Domain controllers that require the sensors:", 
+                        options: [
+                            "DC1 and DC4 only", 
+                            "DC2 and DC5 only", 
+                            "DC1, DC2, DC4, and DC5 only", 
+                            "All the domain controllers in the forest"
+                        ], 
+                        correctAnswer: "All the domain controllers in the forest" 
+                    },
+                    { 
+                        id: "dd-1", 
+                        label: "Authentication info provided during installation:", 
+                        options: [
+                            "An AD DS group managed service account (gMSA)", 
+                            "A cloud-only user from Azure Active Directory (Azure AD)", 
+                            "The access key generated by the Microsoft Defender for Identity portal"
+                        ], 
+                        correctAnswer: "The access key generated by the Microsoft Defender for Identity portal" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>1. All the domain controllers in the forest<br>2. The access key generated by the Microsoft Defender for Identity portal<br>โจทย์สั่งให้ MDI จับตาดูแบบ ALL risks ➡️ ต้องลงเซนเซอร์ ทุกเครื่อง (All DCs) ไม่มีข้อยกเว้น / ตอนรันไฟล์ติดตั้ง (Install) บนเครื่อง ➡️ ต้องใช้ Access Key จาก Portal เพื่อผูกระบบขึ้นคลาวด์!"
+            },
+            // ==========================================
+            // Question 14
+            // ==========================================
+            {
+                question: "You have 10 servers that run Windows Server in a workgroup.<br>You need to configure the servers to encrypt all the network traffic between the servers. The solution must be as secure as possible.<br><br>Which authentication method should you configure in a connection security rule?",
+                options: [
+                    "A. NTLMv2",
+                    "B. pre-shared key",
+                    "C. Kerberos V5",
+                    "D. computer certificate"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "✅ <b>Explanation:</b><br><b>D. computer certificate</b> is correct. Since they are in a workgroup, Kerberos is not available, and certificates are more secure than pre-shared keys.<brทำ IPsec ใน AD (Domain) ➡️ ใช้ Kerberos / ทำ IPsec ในวง Workgroup + เน้นปลอดภัยสุด ➡️ ใช้ Computer certificate เท่านั้น! (ห้ามตอบ Kerberos เด็ดขาด)>"
+            },
+            // ==========================================
+            // Question 15
+            // ==========================================
+            {
+                question: "You have an Azure virtual machine named VM1 that runs Windows Server.<br>You need to encrypt the contents of the disks on VM1 by using Azure Disk Encryption.<br><br>What is a prerequisite for implementing Azure Disk Encryption?",
+                options: [
+                    "A. Customer Lockbox for Microsoft Azure",
+                    "B. an Azure key vault",
+                    "C. a BitLocker recovery key",
+                    "D. data-link layer encryption in Azure"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "✅ <b>Explanation:</b><br><b>B. an Azure key vault</b> is correct. It is required to store the encryption keys.<br>ทำ Azure Disk Encryption (ADE) ➡️ ต้องมีที่เก็บกุญแจเข้ารหัส (BitLocker Keys) ➡️ ต้องสร้าง Azure Key Vault เตรียมไว้เสมอ!"
+            },
+            // ==========================================
+            // Question 16
+            // ==========================================
+            {
+                question: "Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains two servers named Server1 and Server2 that run Windows Server.<br>You need to ensure that you can use the Computer Management console to manage Server2. The solution must use the principle of least privilege.<br><br>Which two Windows Defender Firewall with Advanced Security rules should you enable on Server2? (Combined as a single choice)",
+                options: [
+                    "A. The COM+ Network Access (DCOM-In) rule AND All the rules in the Remote Event Log Management group",
+                    "B. The COM+ Network Access (DCOM-In) rule AND The Windows Management Instrumentation (WMI-In) rule",
+                    "C. The Windows Management Instrumentation (WMI-In) rule AND The COM+ Remote Administration (DCOM-In) rule",
+                    "D. All the rules in the Remote Event Log Management group AND The Windows Management Instrumentation (DCOM-In) rule"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "✅ <b>Explanation:</b><br><b>A is correct.</b> You need COM+ Network Access (DCOM-In) and Remote Event Log Management.<br>รีโมทด้วยโปรแกรม Computer Management ➡️ Firewall ต้องเปิด 2 อย่าง ➡️ COM+ (DCOM-In) ให้ตัวโปรแกรมเข้าได้ + Remote Event Log ให้ดึงหน้าต่าง Log ได้โดยไม่ Error!"
+            },
+            // ==========================================
+            // Question 17
+            // ==========================================
+            {
+                question: "You have a server that runs Windows Server. The server is configured to encrypt all incoming traffic by using a connection security rule.<br>You need to ensure that Server1 can respond to the unencrypted tracert commands initiated from computers on the same network.<br><br>What should you do from Windows Defender Firewall with Advanced Security?",
+                options: [
+                    "A. From the IPsec Settings, configure IPsec defaults.",
+                    "B. Create a new custom outbound rule that allows ICMPv4 protocol connections for all profiles.",
+                    "C. Change the Firewall state of the Private profile to Off.",
+                    "D. From the IPsec Settings, configure IPsec exemptions."
+                ],
+                correctAnswerIndex: 3,
+                explanation: "✅ <b>Explanation:</b><br><b>D. From the IPsec Settings, configure IPsec exemptions</b> is correct.<br>บังคับ IPsec เข้ารหัสหมด ➡️ แต่ต้องการใช้ Ping / Tracert (ICMP) แบบไม่เข้ารหัส ➡️ ต้องไปติ๊กยกเว้นที่ IPsec exemptions (สร้าง Firewall Rule ช่วยไม่ได้!)"
+            },
+            // ==========================================
+            // Question 18
+            // ==========================================
+            {
+                question: "You have an Azure virtual machine named VM1.<br>You enable Microsoft Defender SmartScreen on VM1.<br>You need to ensure that the SmartScreen messages displayed to users are logged.<br><br>What should you do?",
+                options: [
+                    "A. From a command prompt, run WinRM quickconfig.",
+                    "B. From the local Group Policy, modify the Advanced Audit Policy Configuration settings.",
+                    "C. From Event Viewer, enable the Debug log.",
+                    "D. From the Windows Security app, configure the Virus & threat protection settings."
+                ],
+                correctAnswerIndex: 2,
+                explanation: "✅ <b>Explanation:</b><br><b>C. From Event Viewer, enable the Debug log</b> is correct.<br>อยากเก็บ Log หน้าต่างแจ้งเตือนของ SmartScreen ➡️ มันซ่อนอยู่และถูกปิดไว้โดย Default ➡️ ต้องเข้า Event Viewer ไปกดเปิด (Enable) ตัว Debug log!"
+            },
+            // ==========================================
+            // Question 19 
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains a server named Server1 that runs Windows Server.<br>You run <code>Get-BitLockerVolume -MountPoint C,D | fl *</code>, which generates the following output:<br><br>" +
+                          "<div style='background-color: #012456; color: white; padding: 15px; border-radius: 8px; font-family: Consolas, monospace; font-size: 0.9em; overflow-x: auto; white-space: pre;'>" +
+                          "PS C:\\> Get-BitLockerVolume -MountPoint C,D | fl *\n\n" +
+                          "ComputerName           : Server1\n" +
+                          "MountPoint             : C:\n" +
+                          "EncryptionMethod       : XtsAes128\n" +
+                          "AutoUnlockEnabled      : \n" +
+                          "AutoUnlockKeyStored    : False\n" +
+                          "MetadataVersion        : 2\n" +
+                          "VolumeStatus           : FullyEncrypted\n" +
+                          "ProtectionStatus       : On\n" +
+                          "LockStatus             : Unlocked\n" +
+                          "EncryptionPercentage   : 100\n" +
+                          "WipePercentage         : 0\n" +
+                          "VolumeType             : OperatingSystem\n" +
+                          "CapacityGB             : 126\n" +
+                          "KeyProtector           : {Tpm}\n\n" +
+                          "ComputerName           : Server1\n" +
+                          "MountPoint             : D:\n" +
+                          "EncryptionMethod       : XtsAes128\n" +
+                          "AutoUnlockEnabled      : \n" +
+                          "AutoUnlockKeyStored    : False\n" +
+                          "MetadataVersion        : 2\n" +
+                          "VolumeStatus           : FullyEncrypted\n" +
+                          "ProtectionStatus       : On\n" +
+                          "LockStatus             : Locked\n" +
+                          "EncryptionPercentage   : 100\n" +
+                          "WipePercentage         : 0\n" +
+                          "VolumeType             : Data\n" +
+                          "CapacityGB             : 250\n" +
+                          "KeyProtector           : {RecoveryPassword}" +
+                          "</div><br>" +
+                          "You need to ensure that volume D will be unlocked automatically when Server1 restarts.<br><br>How should you complete the command? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q19-dd1", 
+                        label: "Command:", 
+                        options: ["Add-BitLockerKeyProtector", "Clear-BitLockerAutoUnlock", "Enable-BitLockerAutoUnlock"], 
+                        correctAnswer: "Add-BitLockerKeyProtector" 
+                    },
+                    { 
+                        id: "q19-dd2", 
+                        label: "-MountPoint D: -ADAccountOrGroupProtector CONTOSO\\Server1$ Parameter:", 
+                        options: ["-Service", "-TPMandPinAndStartupKeyProtector", "-TPMandPinProtector"], 
+                        correctAnswer: "-Service" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>โจทย์สั่งทำ Auto-Unlock ไดรฟ์ Data ➡️ เช็คไดรฟ์ C: ก่อน! ➡️ ถ้าไดรฟ์ C: ไม่ได้เข้ารหัส ➡️ ใช้ Enable-AutoUnlock ไม่ได้เด็ดขาด ➡️ ต้องเลี่ยงไปใช้ Add-Protector ผูกกับ AD Account แล้วตามด้วย -Service!"
+            },
+            // ==========================================
+            // Question 20 
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your network contains an on-premises Active Directory Domain Services (AD DS) domain named contoso.com. The domain contains the accounts shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Account type</th><th>In organization unit (OU)</th></tr>" +
+                          "<tr><td>Admin1</td><td>User</td><td>OU1</td></tr>" +
+                          "<tr><td>Admin1</td><td>User</td><td>OU2</td></tr>" +
+                          "<tr><td>Server1</td><td>Computer</td><td>OU3</td></tr>" +
+                          "<tr><td>Server2</td><td>Computer</td><td>OU4</td></tr>" +
+                           "</table><br>" +
+                          "The domain is configured to store BitLocker recovery keys in Active Directory. Admin1 and Admin2 perform the following configurations:<br>" +
+                          "1. Admin1 turns on BitLocker for volume C on Server1.<br>" +
+                          "2. Admin1 moves Server1 to OU1.<br>" +
+                          "3. Admin2 turns on BitLocker for removable volume E on Server2.<br>" +
+                          "4. Admin2 moves removable volume E from Server2 to Server1 and unlocks the volume.<br><br>" +
+                          "On which Active Directory object can you view each BitLocker recovery key?",
+                dropdowns: [
+                    { 
+                        id: "q20-dd1", 
+                        label: "The BitLocker recovery key for volume C:", 
+                        options: ["Admin1", "contoso.com", "OU1", "OU3", "Server1", "TPM devices"], 
+                        correctAnswer: "Server1" 
+                    },
+                    { 
+                        id: "q20-dd2", 
+                        label: "The BitLocker recovery for volume E:", 
+                        options: ["Admin2", "contoso.com", "OU4", "Server1", "Server2", "TPM devices"], 
+                        correctAnswer: "Server2" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "<b>💡 เทคนิคจำ:</b> Recovery Key จะถูกเก็บไว้ที่ <b>Computer Object ที่เป็นคนสั่งเข้ารหัส (Turn on BitLocker)</b> เสมอครับ ไม่สนว่าปัจจุบันคอมพิวเตอร์เครื่องนั้นจะย้ายไปอยู่ OU ไหน หรือเอา Flash Drive ไปเสียบเครื่องไหน<br><br>" +
+                             "<b>• Volume C:</b> ถูกเปิด BitLocker โดย Admin1 ตอนที่อยู่บน <b>Server1</b> ดังนั้น Key จะถูกเก็บไว้ที่ Object ของ <b>Server1</b> ใน AD<br>" +
+                             "<b>• Volume E:</b> ถูกเปิด BitLocker โดย Admin2 ตอนที่แฟลชไดรฟ์เสียบอยู่ที่ <b>Server2</b> ดังนั้น Key จะผูกติดและถูกส่งไปเก็บที่ Object ของ <b>Server2</b> ครับ (แม้ว่าตอนหลังจะย้ายแฟลชไดรฟ์ไปเสียบที่ Server1 ก็ตาม)"
+            },
+            // ==========================================
+            // Question 21 
+            // ==========================================
+            {
+                type: "hotspot",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains servers that run Windows Server:<br><br>" +
+                          "<table style='width:50%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.9em;'>" +
+                          "  <tr style='background-color: #f2f2f2;'>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Name</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>IPv4 address</th>" +
+                          "  </tr>" +
+                          "  <tr><td style='border: 1px solid #ddd; padding: 8px;'>Server1</td><td style='border: 1px solid #ddd; padding: 8px;'>172.16.10.10</td></tr>" +
+                          "  <tr><td style='border: 1px solid #ddd; padding: 8px;'>Server2</td><td style='border: 1px solid #ddd; padding: 8px;'>172.16.20.50</td></tr>" +
+                          "  <tr><td style='border: 1px solid #ddd; padding: 8px;'>Server3</td><td style='border: 1px solid #ddd; padding: 8px;'>172.16.30.80</td></tr>" +
+                          "</table>" +
+                          "The connection security rules on <b>Server1</b> are configured as shown in the following table.<br>" +
+                          "<table style='width:100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.9em;'>" +
+                          "  <tr style='background-color: #f2f2f2;'>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Name</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Endpoint 1</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Endpoint 2</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Authentication mode</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Authentication method</th>" +
+                          "  </tr>" +
+                          "  <tr><td style='border: 1px solid #ddd; padding: 8px;'>Rule11</td><td style='border: 1px solid #ddd; padding: 8px;'>Any</td><td style='border: 1px solid #ddd; padding: 8px;'>172.16.20.50</td><td style='border: 1px solid #ddd; padding: 8px;'>Require inbound and outbound</td><td style='border: 1px solid #ddd; padding: 8px;'>Computer and user (NTLMv2)</td></tr>" +
+                          "  <tr><td style='border: 1px solid #ddd; padding: 8px;'>Rule12</td><td style='border: 1px solid #ddd; padding: 8px;'>Any</td><td style='border: 1px solid #ddd; padding: 8px;'>172.16.0.0/16</td><td style='border: 1px solid #ddd; padding: 8px;'>Request inbound and outbound</td><td style='border: 1px solid #ddd; padding: 8px;'>Computer (Kerberos V5)</td></tr>" +
+                          "</table>" +
+                          "The connection security rules on <b>Server2</b> are configured as shown in the following table.<br>" +
+                          "<table style='width:100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.9em;'>" +
+                          "  <tr style='background-color: #f2f2f2;'>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Name</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Endpoint 1</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Endpoint 2</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Authentication mode</th>" +
+                          "    <th style='border: 1px solid #ddd; padding: 8px; text-align: left;'>Authentication method</th>" +
+                          "  </tr>" +
+                          "  <tr><td style='border: 1px solid #ddd; padding: 8px;'>Rule31</td><td style='border: 1px solid #ddd; padding: 8px;'>Any</td><td style='border: 1px solid #ddd; padding: 8px;'>Any</td><td style='border: 1px solid #ddd; padding: 8px;'>Request inbound and outbound</td><td style='border: 1px solid #ddd; padding: 8px;'>Computer (Kerberos V5)</td></tr>" +
+                          "  <tr><td style='border: 1px solid #ddd; padding: 8px;'>Rule32</td><td style='border: 1px solid #ddd; padding: 8px;'>172.16.30.80</td><td style='border: 1px solid #ddd; padding: 8px;'>172.16.10.10</td><td style='border: 1px solid #ddd; padding: 8px;'>Require inbound and outbound</td><td style='border: 1px solid #ddd; padding: 8px;'>Computer and user (NTLMv2)</td></tr>" +
+                          "</table>" +
+                          "For each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+                statements: [
+                    { text: "Server1 can communicate with Server2 successfully.", correctAnswer: "No" },
+                    { text: "Server2 can communicate with Server3 successfully.", correctAnswer: "Yes" },
+                    { text: "Server3 can communicate with Server2 successfully.", correctAnswer: "Yes" }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>" +
+                             "<b>💡 เทคนิคการดู IPsec Connection Security Rule:</b><br>" +
+                             "<b>• Server1 คุยกับ Server2 (No):</b> Server1 บังคับ (Require) ว่าถ้าคุยกับ 172.16.20.50 ต้องใช้ NTLMv2 แต่ Server2 (Rule31) ขอใช้ (Request) Kerberos V5 เมื่อ Authentication method ไม่ตรงกันและฝั่งนึงบังคับ จึงคุยกันไม่รู้เรื่องครับ<br>" +
+                             "<b>• Server2 คุยกับ Server3 (Yes) & Server3 คุยกับ Server2 (Yes):</b> Server2 (Rule31) เป็นแค่ Request (ขอร้อง) ให้ใช้ Kerberos V5 ถ้าอีกฝั่งไม่รองรับ มันก็ยอมถอยกลับไปใช้ Plaintext คุยกันได้ตามปกติครับ"
+            },
+            // ==========================================
+            // Question 22
+            // ==========================================
+            {
+                question: "You have an Azure subscription that contains a user named User1 and the resources shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Description</th></tr>" +
+                          "<tr><td><b>VNet1</b></td><td>Virtual network</td></tr>" +
+                          "<tr><td><b>AppSvr1</b></td><td>Virtual machine that is connected to Vnet1 and runs a legacy app</td></tr>" +
+                          "<tr><td><b>GW1</b></td><td>Virtual network gateway on VNet1</td></tr>" +
+                          "</table><br>" +
+                          "User1 has a computer named Computer1 that runs Windows 11. User1 works from home and establishes a Point-to-Site (P2S) connection to GW1 to access AppSvr1.<br><br>" +
+                          "You deploy the resources shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Description</th></tr>" +
+                          "<tr><td><b>VNet2</b></td><td>Virtual network that is peered with VNet1</td></tr>" +
+                          "<tr><td><b>AppSvr2</b></td><td>Virtual machine that is connected to VNet2</td></tr>" +
+                          "</table><br>" +
+                          "User1 cannot access AppSvr2.<br>You need to ensure that User1 can access AppSvr2.<br><br>" +
+                          "What should you do?",
+                options: [
+                    "A. On Computer1, download and reinstall the VPN client.",
+                    "B. Create a route table and associate the table with GatewaySubnet on VNet1.",
+                    "C. On Computer1, modify the Windows Defender Firewall settings.",
+                    "D. Add a service endpoint to VNet2."
+                ],
+                correctAnswerIndex: 0,
+                explanation: "✅ <b>Explanation:</b><br><b>A. On Computer1, download and reinstall the VPN client</b> is correct. It updates the routing table on the client.<br>ทำ P2S VPN ไว้ ➡️ ภายหลังมีการเชื่อม VNet เพิ่ม (Peering) ➡️ เครื่อง Client ที่บ้านมองไม่เห็นวงใหม่ ➡️ ต้องไปโหลด VPN Client มา ติดตั้งใหม่ (Reinstall) เพื่ออัปเดต Route เสมอ"
+            },
+            // ==========================================
+            // Question 23 
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>You have a generation 1 Azure virtual machine named VM1 that runs Windows Server and is joined to an Active Directory domain.<br>You plan to enable BitLocker Drive Encryption (BitLocker) on volume C of VM1.<br>You need to ensure that the BitLocker recovery key for VM1 is stored in Active Directory.<br><br>Which two Group Policy settings should you configure first? To answer, select the settings in the answer area.<br><br>" +
+                          "<div style='text-align: center; margin: 20px 0;'>" +
+                          "  <img src='images1/Q23.jpg' style='max-width: 100%; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>" +
+                          "</div>",
+                dropdowns: [
+                    { 
+                        id: "q23-dd1", 
+                        label: "Setting 1:", 
+                        options: [
+                            "Allow network unlock at startup",
+                            "Allow Secure Boot for integrity validation",
+                            "Require additional authentication at startup (Windows Server 2008 and Windows Vista)",
+                            "Disallow standard users from changing the PIN or password",
+                            "Allow devices compliant with InstantGo or HSTI to opt out of pre-boot PIN",
+			    "Require additional authentication at startup",
+                            "Choose how BitLocker-protected operating system drives can be recovered",
+                            "Configure pre-boot recovery message and URL"
+                        ], 
+                        correctAnswer: "Require additional authentication at startup" 
+                    },
+                    { 
+                        id: "q23-dd2", 
+                        label: "Setting 2:", 
+                        options: [
+                            "Allow network unlock at startup",
+                            "Allow Secure Boot for integrity validation",
+                            "Require additional authentication at startup (Windows Server 2008 and Windows Vista)",
+                            "Disallow standard users from changing the PIN or password",
+                            "Allow devices compliant with InstantGo or HSTI to opt out of pre-boot PIN",
+			    "Require additional authentication at startup",
+                            "Choose how BitLocker-protected operating system drives can be recovered",
+                            "Configure pre-boot recovery message and URL"
+                        ], 
+                        correctAnswer: "Choose how BitLocker-protected operating system drives can be recovered" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>Since it's Generation 1 (no TPM), you must 'Require additional authentication at startup'. Also, you must configure 'Choose how BitLocker-protected OS drives can be recovered' to store keys in AD.<br>ทำ BitLocker ไดรฟ์ C บน VM Gen 1 (ไม่มี TPM)<br>➡️ ต้องปลดล็อกด้วย Require additional auth... / บังคับเก็บ Key ลง AD<br>➡️ ต้องไปตั้งค่าที่ Choose how... recovered"
+            },
+            // ==========================================
+            // Question 24
+            // ==========================================
+            {
+                question: "Note: This question is part of a series of questions that present the same scenario. Each question in the series contains a unique solution that might meet the stated goals.<br><br>You have a server named Server1 that runs Windows Server.<br>You need to ensure that only specific applications can modify the data in protected folders on Server1.<br><br>Solution: From App & browser control, you configure Reputation-based protection.<br><br>Does this meet the goal?",
+                options: [
+                    "A. Yes",
+                    "B. No"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "✅ <b>Explanation:</b><br><b>B. No</b> is correct. Reputation-based protection (SmartScreen) does not protect folders from unauthorized modification.<br>โจทย์สั่งป้องกัน Protected folders / กันให้เฉพาะ Specific apps แก้ไขได้ ➡️ ต้องใช้ฟีเจอร์ Controlled folder access เท่านั้น!"
+            },
+            // ==========================================
+            // Question 25 
+            // ==========================================
+            {
+                type: "dragdrop",
+                question: "DRAG DROP - <br>You have an Azure subscription that contains an Azure key vault named Vault1.<br>You plan to deploy a virtual machine named VM1 that will run Windows Server.<br>You need to enable encryption at host for VM1. The solution must use customer-managed keys.<br><br>Which three actions should you perform in sequence? To answer, drag the appropriate actions from the list to the answer area and arrange them in the correct order.",
+                draggables: [
+                    "Create VM1 and associate the disks of the virtual machine with the disk encryption set.",
+                    "Enable a system-assigned managed identity on VM1.",
+                    "Create a disk encryption set and generate RSA keys.",
+                    "Assign the Virtual Machine Contributor role to the system-assigned managed identity of VM1.",
+                    "Grant Vault1 the managed identity permission for the disk encryption set."
+                ],
+                correctOrder: [
+                    "Create a disk encryption set and generate RSA keys.",
+                    "Grant Vault1 the managed identity permission for the disk encryption set.",
+                    "Create VM1 and associate the disks of the virtual machine with the disk encryption set."
+                ],
+                explanation: "✅ <b>Explanation:</b><br>1. Create a disk encryption set and generate RSA keys.<br>2. Grant Vault1 the managed identity permission for the disk encryption set.<br>3. Create VM1 and associate the disks of the virtual machine with the disk encryption set.<br>การทำ Customer-Managed Keys (CMK) Encryption บน Azure <br>➡️ ตู้เซฟมีแล้ว Vault1 <br>➡️ 1. ต้องสร้างคนกลาง Disk Encryption Set(DES) <br>➡️ 2. ให้สิทธิ์ DES เข้าตู้เซฟ (Vault) <br>➡️ 3. สร้าง VM มาผูกกับ DES!(Disk Encryption Set)"          
+		},
+            // ==========================================
+            // Question 26 
+            // ==========================================
+            {
+                type: "hotspot",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains three servers named Server1, Server2, and Server3 that run Windows Server. All the servers are on the same network and have network connectivity.<br><br>" +
+                          "<b>Server1</b>, Windows Defender Firewall has a connection security rule:<br>" +
+                          "• Rule Type: Server-to-server<br>" +
+                          "• Endpoint 1 & 2: Any IP address<br>" +
+                          "• Requirements: <b>Require</b> authentication for inbound connections and <b>request</b> authentication for outbound connections<br>" +
+                          "• Authentication Method: Computer (Kerberos V5)<br><br>" +
+                          "<b>Server2</b> has <b>no</b> connection security rules.<br><br>" +
+                          "<b>Server3</b>, Windows Defender Firewall has a connection security rule:<br>" +
+                          "• Rule Type: Server-to-server<br>" +
+                          "• Endpoint 1 & 2: Any IP address<br>" +
+                          "• Requirements: <b>Request</b> authentication for inbound and outbound connections<br>" +
+                          "• Authentication Method: Computer (Kerberos V5)<br><br>" +
+                          "For each of the following statements, select Yes if the statement is true. Otherwise, select No.",
+                statements: [
+                    { text: "When Server1 establishes a network connection with Server2, the connection is encrypted.", correctAnswer: "No" },
+                    { text: "Server2 can establish a network connection with Server3.", correctAnswer: "Yes" },
+                    { text: "When Server3 establishes a network connection with Server1, the connection is encrypted.", correctAnswer: "Yes" }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>1. No (Fallback to cleartext because Server2 has no IPsec rule).<br>2. Yes (Server3 allows cleartext inbound).<br>3. Yes (Server3 requests, Server1 requires, both use Kerberos, so they encrypt).<br>จำไว้ว่า Request คือการประนีประนอม (ยอมคุยแบบไม่เข้ารหัสได้ถ้าจำเป็น) / Require คือการหักดิบ (ไม่เข้ารหัสคือเตะทิ้ง)<br>➡️ ถ้า Request ไปเจอคนไม่มีกฎ = คุยกันรอดแต่ไม่เข้ารหัส<br> ➡️ ถ้า Request ไปเจอ Require (แถม Auth ตรงกัน) = คุยกันรอดและได้เข้ารหัส"
+            },
+            // ==========================================
+            // Question 27 
+            // ==========================================
+            {
+                question: "Your network contains an Active Directory Domain Services (AD DS) forest. The forest functional level is Windows Server 2012 R2. The forest contains the domains shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Operating system of all domain controllers</th><th>Domain functional level</tr>" +
+                          "<tr><td>contoso.com</td><td>Windows Server 2016</td><td>Windows Server 2012 R2</tr>" +
+                          "<tr><td>east.contoso.com</td><td>Windows Server 2019</td><td>Windows Server 2016</tr>" +
+                          "</table><br>" +
+                          "You create a user named Admin1.<br><br>" +
+                          "You need to ensure that Admin1 can add a new domain controller that runs Windows Server 2022 to the east.contoso.com domain. The solution must follow the principle of least privilege.<br><br>" +
+                          "To which groups should you add Admin1?",
+                options: [
+                    "A. EAST\\Domain Admins only",
+                    "B. CONTOSO\\Enterprise Admins only",
+                    "C. CONTOSO\\Schema Admins and EAST\\Domain Admins",
+                    "D. CONTOSO\\Enterprise Admins and CONTOSO\\Schema Admins"
+                ],
+                correctAnswerIndex: 0, 
+                explanation: "✅ <b>Explanation:</b><br><b>A. EAST\\Domain Admins only</b> is correct. Since the schema is already updated by Windows Server 2019, you only need Domain Admins of the target domain.<br><b>กฎเหล็กของ AD มีอยู่ว่า:</b> เมื่อไหร่ก็ตามที่เรานำ Windows Server เวอร์ชันที่ใหม่กว่า เข้ามาเป็น DC เครื่องแรกใน Forest เราจะต้องทำการอัปเดตโครงสร้างหลักของ AD (ที่เรียกว่า Schema และ Forest Prep) เสมอ เพื่อให้ระบบรู้จักฟีเจอร์ใหม่ๆ ของ OS นั้น<br> AD Schema ของ WS2019 กับ WS2022 คือเวอร์ชัน 88 เท่ากัน <br>➡️ ถ้าในForestมี WS2019 อยู่แล้ว แปลว่า Schema อัปเดตแล้ว <br>➡️ เอา WS2022 เข้ามาเพิ่ม ไม่ต้องใช้ Schema Admins หรือ Enterprise Admins <br>➡️เมื่อระบบไม่ต้องทำการอัปเดต Schema หรืออัปเดตระดับ Forest ใดๆ อีก การโปรโมทเครื่องเซิร์ฟเวอร์ใหม่ให้เป็น DC ในโดเมน east.contoso.com จึงต้องการแค่สิทธิ์ระดับ ผู้ดูแลโดเมนนั้นๆ ก็เพียงพอแล้วครับ ไม่จำเป็นต้องไปกวนสิทธิ์ระดับสูงของป่าใหญ่เลย"
+            },
+            // ==========================================
+            // Question 28 
+            // ==========================================
+            {
+                question: "You have an Azure subscription named Sub1 that contains a resource group named RG1. RG1 contains the resources shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Type</th><th>Description</th></tr>" +
+                          "<tr><td>VM1</td><td>Virtual machine</td><td>Runs Windows Server 2022</td></tr>" +
+                          "<tr><td>NIC1</td><td>Network interface</td><td>Network interface of VM1</td></tr>" +
+                          "<tr><td>PIP1</td><td>Public IP address</td><td>Public IP address assigned to NIC1</td></tr>" +
+                          "<tr><td>Disk1</td><td>Disk</td><td>Managed disk attached to VM1</td></tr>" +
+                          "<tr><td>VNet1</td><td>Virtual network</td><td>Virtual network that contains a subnet named Subnet1 to which NIC1 is attached</td></tr>" +
+                          "</table><br>" +
+                          "Sub1 has Microsoft Defender for Servers enabled. You are assigned the Contributor role for Sub1.<br><br>You need to implement just-in-time (JIT) VM access for VM1.<br><br>What should you do first?",
+                options: [
+                    "A. Create a network security group (NSG).",
+                    "B. Enable enhanced security in Microsoft Defender for Cloud.",
+                    "C. Request the Owner role for Sub1.",
+                    "D. Create an application security group."
+                ],
+                correctAnswerIndex: 0,
+                explanation: "✅ <b>Explanation:</b><br><b>A. Create a network security group (NSG)</b> is correct. JIT requires an NSG on the VM's subnet or NIC.<br>จะเปิด JIT VM Access ซึ่ง JIT จะเข้าไปทำงานโดยการแก้กฎไฟร์วอลล์ <br>➡️ ต้องเช็คก่อนว่า VM มี NSG (Network Security Group) ผูกอยู่ไหม <br>➡️ ถ้าไม่มี ต้องสร้าง NSG ก่อนเป็นอันดับแรก<br>JIT VM Access ทำงานยังไง?<br>กลไกของ JIT คือมันจะเข้าไป เขียนกฎ (Rules) เปิด-ปิดพอร์ต ในไฟล์ร์วอลล์ของ Azure แบบอัตโนมัติเมื่อมีคนร้องขอ และเมื่อหมดเวลามันก็จะลบกฎนั้นทิ้งไป<br>ไฟร์วอลล์ที่ว่าคืออะไร?: ใน Azure ตัวที่ทำหน้าที่นี้คือ Network Security Group (NSG) ครับ! JIT จำเป็นต้องมี NSG ผูกอยู่กับ Network Interface (NIC) หรือ Subnet ของ VM นั้นๆ เพื่อให้มันมีที่สำหรับเข้าไปเพิ่ม/ลดกฎ"
+            },
+            // ==========================================
+            // Question 29 
+            // ==========================================
+            {
+                type: "dropdown",
+                question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain named contoso.com. The domain contains an organizational unit (OU) named OU1. OU1 contains servers that run sensitive workloads.<br><br>" +
+                          "You plan to add connection security rules that meet the following requirements:<br>" +
+                          "<ul><li>The servers in OU1 must <b>only accept</b> connections from domain-joined computers.</li>" +
+                          "<li>The servers in OU1 must <b>only be able to communicate</b> with domain-joined computers.</li></ul>" +
+                          "You create a Group Policy Object (GPO) named GPO1 and link GPO1 to contoso.com.<br><br>" +
+                          "You need to configure a connection security rule in GPO1 by using Windows Defender Firewall with Advanced Security.<br><br>" +
+                          "How should you configure the rule? To answer, select the appropriate options in the answer area.",
+                dropdowns: [
+                    { 
+                        id: "q29-dd1", 
+                        label: "Rule Type:", 
+                        options: ["Authentication exemption", "Isolation", "Tunnel"], 
+                        correctAnswer: "Isolation" 
+                    },
+                    { 
+                        id: "q29-dd2", 
+                        label: "Requirements:", 
+                        options: ["Request authentication for inbound and outbound connections", "Require authentication for inbound and outbound connections", "Require authentication for inbound connections and request authentication for outbound connections"], 
+                        correctAnswer: "Require authentication for inbound and outbound connections" 
+                    },
+                    { 
+                        id: "q29-dd3", 
+                        label: "Authentication Method:", 
+                        options: ["Computer certificate", "Computer (Kerberos V5)", "Preshared key"], 
+                        correctAnswer: "Computer (Kerberos V5)" 
+                    }
+                ],
+                explanation: "✅ <b>Explanation:</b><br>1.Rule Type must be :Isolation.<br>2.Requirements must be :Require for inbound and outbound (to block non-domain).<br> 3.Method is :Computer (Kerberos V5).<br> <b>- Isolation :</b>เมื่อต้องการจำกัดให้เครื่องเซิร์ฟเวอร์คุยได้เฉพาะกลุ่มใดกลุ่มหนึ่ง (ในกรณีนี้คือกลุ่มเครื่องในโดเมน) ตามหลักของ Windows Firewall จะเรียกพฤติกรรมนี้ว่าการทำ Server Isolation หรือ Domain Isolation มันคือการ แยกกักบริเวณ เครื่องที่มีความสำคัญออกจากเครื่องทั่วไปที่ไม่ได้อยู่ในโดเมน<br><b>- Require authentication for inbound and outbound connections :</b>ในโจทย์คำว่า Only (ต้อง...เท่านั้น) ทั้งขาเข้า (accept) และขาออก (communicate) แปลว่าเราจะไม่มีการประนีประนอมใดๆ ทั้งสิ้นครับ ห้ามใช้ Request (ร้องขอ) เด็ดขาด เพราะถ้าใช้ Request แล้วอีกฝั่งไม่เข้ารหัส มันจะยอมลดระดับไปคุยแบบธรรมดา ซึ่งผิดกฎข้อนี้ <br><b>- Computer (Kerberos V5) :</b>โปรโตคอลหลักที่ Active Directory ใช้ในการยืนยันตัวตนว่าคอมพิวเตอร์เครื่องนี้เป็นลูกบ้านในโดเมนก็คือ Kerberos V5 "
+            },
+            // ==========================================
+            // Question 30 
+            // ==========================================
+            {
+                type: "dragdrop",
+                question: "DRAG DROP - <br>You have a Windows Server 2022 failover cluster named Cluster that contains the Cluster Shared Volumes (CSV) shown in the following table.<br><br>" +
+                          "<table class='info-table'>" +
+                          "<tr><th>Name</th><th>Owner</th></tr>" +
+                          "<tr><td>Volume1</td><td>Node1</td></tr>" +
+                          "<tr><td>Volume2</td><td>Node2</td></tr>" +
+                          "</table><br>" +
+                          "All the nodes in Cluster1 have BitLocker Drive Encryption (BitLocker) installed.<br><br>" +
+                          "You need to use PowerShell to enable BitLocker on Volume1.<br><br>" +
+                          "In which order should you run the commands? To answer, drag the appropriate commands to the correct order.",
+                draggables: [
+                    "Enable-BitLocker -MountPoint 'C:\\ClusterStorage\\Volume1' -RecoveryPasswordProtector",
+                    "Get-ClusterSharedVolume 'Volume1' | Set-ClusterParameter -Name BitLockerProtectorInfo -Value '$KeyProtectorID.keyprotectorid:$KeyProtectorID.RecoveryPassword' -Create",
+                    "Get-ClusterSharedVolume -Name 'Volume1' | Suspend-ClusterResource",
+                    "Get-ClusterSharedVolume -Name 'Volume1' | Resume-ClusterResource",
+                    "$KeyProtectorID = (Get-BitlockerVolume -MountPoint 'C:\\ClusterStorage\\Volume1').KeyProtector"
+                ],
+                correctOrder: [
+                    "Get-ClusterSharedVolume -Name 'Volume1' | Suspend-ClusterResource",
+                    "Enable-BitLocker -MountPoint 'C:\\ClusterStorage\\Volume1' -RecoveryPasswordProtector",
+                    "$KeyProtectorID = (Get-BitlockerVolume -MountPoint 'C:\\ClusterStorage\\Volume1').KeyProtector",
+                    "Get-ClusterSharedVolume 'Volume1' | Set-ClusterParameter -Name BitLockerProtectorInfo -Value '$KeyProtectorID.keyprotectorid:$KeyProtectorID.RecoveryPassword' -Create",
+                    "Get-ClusterSharedVolume -Name 'Volume1' | Resume-ClusterResource"
+                ],
+                explanation: "✅ <b>Explanation:</b><br>1.Suspend CSV(หยุดการทำงานชั่วคราว (Maintenance Mode))<br> 2.Enable-BitLocker(เริ่มการเข้ารหัส (Enable BitLocker)) <br>3.get KeyProtectorID (ดึงรหัสกุญแจเก็บไว้ในตัวแปร)<br> 4.configure Cluster Parameter(แจกจ่ายกุญแจให้ Cluster รู้จัก)<br>5.and finally Resume CSV.(ปลดป้ายซ่อมบำรุง (Bring Online))"
+            }
+        ];
+
+        // ==========================================
+        // 🚨 ตั้งค่าเลขข้อเริ่มต้นของไฟล์นี้ตรงนี้ครับ!
+        // ==========================================
+        const STARTING_QUESTION_NUMBER = 1; 
+
+        let currentQuestion = 0; 
+        let score = 0; 
+        let questionStates = []; 
+
+        function getQuestionInfo(globalIndex) {
+            if(quizData.length === 0) return { topicName: "Topic", questionNumber: STARTING_QUESTION_NUMBER };
+            let firstTopicOfFile = quizData[0].topic || "Topic 1"; 
+            let topic = firstTopicOfFile; 
+            let localNum = STARTING_QUESTION_NUMBER; 
+
+            for (let i = 1; i <= globalIndex; i++) {
+                if (quizData[i].topic && quizData[i].topic !== topic) {
+                    topic = quizData[i].topic; 
+                    localNum = 1;              
+                } else {
+                    localNum++;                
+                }
+            }
+            return { topicName: topic, questionNumber: localNum };
+        }
+
+        function drawNavigationGrid() {
+            const navGrid = document.getElementById('navigation-grid');
+            navGrid.innerHTML = '';
+            let currentTopicName = "";
+            let currentTopicGroup = null;
+            let localNum = 1;
+            const firstTopicOfFile = quizData[0].topic || "Topic 1";
+
+            quizData.forEach((q, index) => {
+                let thisTopic = q.topic ? q.topic : currentTopicName;
+                if (!thisTopic) thisTopic = "Topic 1"; 
+
+                if (thisTopic !== currentTopicName) {
+                    currentTopicName = thisTopic;
+                    
+                    if (currentTopicName === firstTopicOfFile) {
+                        localNum = STARTING_QUESTION_NUMBER;
+                    } else {
+                        localNum = 1;
+                    }
+                    
+                    const topicHeader = document.createElement('div');
+                    topicHeader.style.width = '100%';
+                    topicHeader.style.fontWeight = 'bold';
+                    topicHeader.style.marginTop = index === 0 ? '0px' : '15px';
+                    topicHeader.style.marginBottom = '8px';
+                    topicHeader.style.color = '#0078d4';
+                    topicHeader.style.borderBottom = '1px solid #ccc';
+                    topicHeader.innerText = currentTopicName;
+                    navGrid.appendChild(topicHeader);
+                    
+                    currentTopicGroup = document.createElement('div');
+                    currentTopicGroup.style.display = 'flex';
+                    currentTopicGroup.style.flexWrap = 'wrap';
+                    currentTopicGroup.style.gap = '8px';
+                    currentTopicGroup.style.width = '100%';
+                    navGrid.appendChild(currentTopicGroup);
+                }
+
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.innerText = localNum; 
+                if (index === currentQuestion) btn.classList.add('active');
+                else if (questionStates[index] === true) btn.classList.add('answered-correct');
+                else if (questionStates[index] === false) btn.classList.add('answered-wrong');
+                btn.onclick = () => jumpToQuestion(index);
+                currentTopicGroup.appendChild(btn);
+                localNum++;
+            });
+        }
+
+        function jumpToQuestion(index) {
+            currentQuestion = index;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if(questionStates.length === 0) questionStates = new Array(quizData.length).fill(null);
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('prev-btn').disabled = (currentQuestion === 0); 
+            
+            drawNavigationGrid(); 
+
+            const q = quizData[currentQuestion];
+            const info = getQuestionInfo(currentQuestion);
+            
+            document.getElementById('question-counter').innerText = `${info.topicName} - Question: ${info.questionNumber}`;
+            
+            let topicHtml = `<div style='font-size: 1.1em; color: #d9534f; margin-bottom: 15px; font-weight: bold; padding-bottom: 5px; border-bottom: 2px dashed #ccc;'>📌 ${info.topicName}</div>`;
+            document.getElementById('question-text').innerHTML = `${topicHtml}<div class="question-badge">Question ${info.questionNumber}</div><br>${q.question}`;
+            
+            const mcqContainer = document.getElementById('options-container');
+            const ddContainer = document.getElementById('dragdrop-container');
+            const hsContainer = document.getElementById('hotspot-container');
+            const dropdownContainer = document.getElementById('dropdown-container');
+            
+            mcqContainer.style.display = "none"; ddContainer.style.display = "none"; hsContainer.style.display = "none"; dropdownContainer.style.display = "none";
+
+            if (!q.type || q.type === "mcq" || q.type === "multiple_select") {
+                mcqContainer.style.display = "block"; mcqContainer.innerHTML = '';
+                let inputType = (q.type === "multiple_select") ? "checkbox" : "radio";
+                q.options.forEach((opt, index) => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `<input type="${inputType}" name="option" value="${index}"> <span style="margin-left:10px;">${opt}</span>`;
+                    mcqContainer.appendChild(label);
+                });
+            } 
+            else if (q.type === "dragdrop") {
+                ddContainer.style.display = "flex";
+                const sourceBox = document.getElementById('source-box'); 
+                const targetsWrapper = document.getElementById('targets-wrapper');
+                
+                sourceBox.innerHTML = '<h4>Options</h4>';
+                targetsWrapper.innerHTML = ''; 
+
+                q.draggables.forEach((itemText, index) => {
+                    const div = document.createElement('div'); div.className = 'draggable'; div.id = `drag-${index}`; div.draggable = true; div.ondragstart = drag; div.innerText = itemText; sourceBox.appendChild(div);
+                });
+
+                if (q.targets) {
+                    q.targets.forEach((target, index) => {
+                        targetsWrapper.innerHTML += `<div class="target-area" id="target-box-${index}" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="target-label">${target.label}</div></div>`;
+                    });
+                } else {
+                    targetsWrapper.innerHTML = `<div class="target-area" id="target-box-0" ondrop="drop(event)" ondragover="allowDrop(event)" style="flex:1;"><div class="target-label">Answer Area (Drop here in order)</div></div>`;
+                }
+            }
+            else if (q.type === "hotspot") {
+                hsContainer.style.display = "block";
+                let html = `<table class="hotspot-table"><tr><th>Statements</th><th>Yes</th><th>No</th></tr>`;
+                q.statements.forEach((stmt, index) => {
+                    html += `<tr id="hs-row-${index}">
+                        <td>${stmt.text}</td>
+                        <td onclick="document.getElementById('yes-${index}').checked = true;"><input type="radio" id="yes-${index}" name="hs-${index}" value="Yes"></td>
+                        <td onclick="document.getElementById('no-${index}').checked = true;"><input type="radio" id="no-${index}" name="hs-${index}" value="No"></td>
+                    </tr>`;
+                });
+                html += `</table>`; hsContainer.innerHTML = html;
+            }
+            else if (q.type === "dropdown" || q.type === "inline_dropdown") {
+                dropdownContainer.style.display = "block";
+                let html = '<div class="dd-area" style="text-align:left; overflow-x:auto;"><h3>Answer Area</h3><br>';
+                
+                if (q.type === "inline_dropdown") {
+                    let template = q.inlineTemplate;
+                    q.dropdowns.forEach((dd, index) => {
+                        let selectHtml = `<select id="sel-${index}" class="dd-select" style="width:auto; display:inline-block; margin: 0 5px; font-family:sans-serif; font-size:1em; padding: 5px;"><option value="">-- Select --</option>`;
+                        dd.options.forEach(opt => { selectHtml += `<option value="${opt}">${opt}</option>`; });
+                        selectHtml += `</select>`;
+                        template = template.replace(`[DD${index}]`, selectHtml);
+                    });
+                    html += `<div style="font-family: monospace; font-size: 1.1em; white-space: normal; word-wrap: break-word; padding: 15px; background: white; border: 1px solid #ccc; border-radius: 5px;">${template}</div>`;
+                } else {
+                    q.dropdowns.forEach((dd, index) => {
+                        html += `<div class="dd-row"><div class="dd-label">${dd.label}</div><select id="sel-${index}" class="dd-select"><option value="">-- Select --</option>`;
+                        dd.options.forEach(opt => { html += `<option value="${opt}">${opt}</option>`; });
+                        html += `</select></div>`;
+                    });
+                }
+                html += '</div>'; dropdownContainer.innerHTML = html;
+            }
+
+            if (questionStates[currentQuestion] !== null) {
+                showPastAnswerFeedback();
+            }
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault(); 
+            if(questionStates[currentQuestion] !== null) return;
+            const data = ev.dataTransfer.getData("text"); 
+            const draggedElement = document.getElementById(data);
+            
+            let dropZone = ev.target.closest('.target-area') || ev.target.closest('.dd-box');
+            if (dropZone) dropZone.appendChild(draggedElement);
+        }
+
+        function checkAnswer() {
+            if(questionStates[currentQuestion] !== null) return;
+            const q = quizData[currentQuestion];
+            let isCorrect = false;
+
+            if (!q.type || q.type === "mcq") {
+                const selectedOption = document.querySelector('input[name="option"]:checked');
+                if (!selectedOption) { alert('Please select an answer!'); return; }
+                isCorrect = (parseInt(selectedOption.value) === q.correctAnswerIndex);
+            } 
+            else if (q.type === "multiple_select") {
+                const selectedOptions = document.querySelectorAll('input[name="option"]:checked');
+                if (selectedOptions.length === 0) { alert('Please select your answers!'); return; }
+                const userAnswers = Array.from(selectedOptions).map(opt => parseInt(opt.value)).sort();
+                const correctAnswers = [...q.correctAnswerIndex].sort();
+                isCorrect = JSON.stringify(userAnswers) === JSON.stringify(correctAnswers);
+            }
+            else if (q.type === "dragdrop") {
+                if (q.targets) {
+                    let allCorrect = true;
+                    q.targets.forEach((target, index) => {
+                        const targetBox = document.getElementById(`target-box-${index}`);
+                        const items = Array.from(targetBox.querySelectorAll('.draggable')).map(el => el.innerText.trim());
+                        if (JSON.stringify(items.sort()) !== JSON.stringify(target.expected.sort())) allCorrect = false;
+                    });
+                    isCorrect = allCorrect;
+                } else {
+                    const targetItems = document.getElementById('target-box-0').querySelectorAll('.draggable');
+                    const userAnswers = Array.from(targetItems).map(el => el.innerText.trim());
+                    if (userAnswers.length === 0) { alert('Please drag answers to the area!'); return; }
+                    isCorrect = JSON.stringify(userAnswers) === JSON.stringify(q.correctOrder);
+                }
+            }
+            else if (q.type === "hotspot") {
+                let correctCount = 0; let answeredCount = 0;
+                q.statements.forEach((stmt, index) => {
+                    const selected = document.querySelector(`input[name="hs-${index}"]:checked`);
+                    if (selected) { answeredCount++; if (selected.value === stmt.correctAnswer) correctCount++; }
+                });
+                if (answeredCount < q.statements.length) { alert('Please answer all statements!'); return; }
+                isCorrect = (correctCount === q.statements.length);
+            }
+            else if (q.type === "dropdown" || q.type === "inline_dropdown") {
+                let correctCount = 0; let answeredCount = 0;
+                q.dropdowns.forEach((dd, index) => {
+                    const sel = document.getElementById(`sel-${index}`);
+                    if (sel.value !== "") answeredCount++;
+                    if (sel.value === dd.correctAnswer) correctCount++;
+                });
+                if (answeredCount < q.dropdowns.length) { alert('Please select options for all dropdowns!'); return; }
+                isCorrect = (correctCount === q.dropdowns.length);
+            }
+
+            questionStates[currentQuestion] = isCorrect;
+            if (isCorrect) score++;
+
+            document.getElementById('score-counter').innerText = `Score: ${score}`;
+            showPastAnswerFeedback();
+            drawNavigationGrid(); 
+        }
+
+        function showPastAnswerFeedback() {
+            const q = quizData[currentQuestion];
+            const expBox = document.getElementById('explanation-box');
+            if (questionStates[currentQuestion]) {
+                expBox.className = 'explanation correct-box'; expBox.innerHTML = "<h4>Correct! 🎉</h4>" + q.explanation;
+            } else {
+                expBox.className = 'explanation incorrect-box'; expBox.innerHTML = "<h4>Incorrect / Reviewed</h4>" + q.explanation;
+            }
+            expBox.style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; loadQuestion(); } }
+        function nextQuestion() { 
+            if (currentQuestion < quizData.length - 1) { currentQuestion++; loadQuestion(); } 
+            else { alert(`End of Exam! Total Score: ${score} / ${quizData.length}`); }
+        }
+
+        window.onload = loadQuestion;
+        
+    </script>
+</body>
+</html>
