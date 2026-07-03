@@ -503,20 +503,20 @@
                           "KeyProtector           : {RecoveryPassword}" +
                           "</div><br>" +
                           "You need to ensure that volume D will be unlocked automatically when Server1 restarts.<br><br>How should you complete the command? To answer, select the appropriate options in the answer area.",
-                type: "inline_dropdown",
-                inlineTemplate: "[DD0] filter add -i 192.168.0.100 -t [DD1] sync",
-                question: "HOTSPOT - <br>You have a server named Server1 that runs Windows Server.<br>You need to capture the SYN packets exchanged between Server1 and an IP address of 192.168.0.100.<br><br>How should you complete the command? To answer, select the appropriate options in the answer area.",
                 dropdowns: [
                     { 
-                        id: "q56-dd1", 
-                        options: ["MessageAnalyzer", "netmon", "pktmon"], 
-                        correctAnswer: "pktmon" 
+                        id: "q19-dd1", 
+                        label: "Command:", 
+                        options: ["Add-BitLockerKeyProtector", "Clear-BitLockerAutoUnlock", "Enable-BitLockerAutoUnlock"], 
+                        correctAnswer: "Add-BitLockerKeyProtector" 
                     },
                     { 
-                        id: "q56-dd2", 
-                        options: ["icmp", "tcp", "udp"], 
-                        correctAnswer: "tcp" 
+                        id: "q19-dd2", 
+                        label: "-MountPoint D: -ADAccountOrGroupProtector CONTOSO\\Server1$ Parameter:", 
+                        options: ["-Service", "-TPMandPinAndStartupKeyProtector", "-TPMandPinProtector"], 
+                        correctAnswer: "-Service" 
                     }
+                ],
                 ],
                 explanation: "✅ <b>Explanation:</b><br>โจทย์สั่งทำ Auto-Unlock ไดรฟ์ Data ➡️ เช็คไดรฟ์ C: ก่อน! ➡️ ถ้าไดรฟ์ C: ไม่ได้เข้ารหัส ➡️ ใช้ Enable-AutoUnlock ไม่ได้เด็ดขาด ➡️ ต้องเลี่ยงไปใช้ Add-Protector ผูกกับ AD Account แล้วตามด้วย -Service!"
             },
