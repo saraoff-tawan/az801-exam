@@ -469,7 +469,7 @@
             // Question 19 
             // ==========================================
             {
-                type: "dropdown",
+                type: "inline_dropdown",
                 question: "HOTSPOT - <br>Your network contains an Active Directory Domain Services (AD DS) domain. The domain contains a server named Server1 that runs Windows Server.<br>You run <code>Get-BitLockerVolume -MountPoint C,D | fl *</code>, which generates the following output:<br><br>" +
                           "<div style='background-color: #012456; color: white; padding: 15px; border-radius: 8px; font-family: Consolas, monospace; font-size: 0.9em; overflow-x: auto; white-space: pre;'>" +
                           "PS C:\\> Get-BitLockerVolume -MountPoint C,D | fl *\n\n" +
@@ -503,7 +503,8 @@
                           "KeyProtector           : {RecoveryPassword}" +
                           "</div><br>" +
                           "You need to ensure that volume D will be unlocked automatically when Server1 restarts.<br><br>How should you complete the command? To answer, select the appropriate options in the answer area.",
-                dropdowns: [
+                inlineTemplate: "[DD0] -MountPoint D: -ADAccountOrGroupProtector CONTOSO\\Server1$;[DD1]",
+				dropdowns: [
                     { 
                         id: "q19-dd1", 
                         label: "Command:", 
@@ -512,7 +513,7 @@
                     },
                     { 
                         id: "q19-dd2", 
-                        label: "-MountPoint D: -ADAccountOrGroupProtector CONTOSO\\Server1$ Parameter:", 
+                        label: "Command:", 
                         options: ["-Service", "-TPMandPinAndStartupKeyProtector", "-TPMandPinProtector"], 
                         correctAnswer: "-Service" 
                     }
