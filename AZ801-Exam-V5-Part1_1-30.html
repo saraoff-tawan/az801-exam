@@ -343,7 +343,12 @@
                     "D. Guest Configuration agent"
                 ],
                 correctAnswerIndex: 2,
-                explanation: "✅ <b>Explanation:</b><br><b>C. Log Analytics agent for Azure VMs</b> is correct.<br>ส่ง Security Log/Exploits ขึ้น Defender ➡️ ต้องมีคนส่งข้อมูลให้ ➡️ ตอบ Log Analytics agent เสมอ!<br><b>หมายเหตุ:</b>สำหรับความรู้หน้างานจริง: ปัจจุบัน Microsoft กำลังทยอยบังคับให้ย้ายไปใช้ Azure Monitor Agent (AMA) แทน Log Analytics agent แล้วนะครับ แต่ในบริบทของข้อสอบที่ยังไม่อัปเดตชอยส์นี้ ให้ตอบข้อ C. ไปก่อนครับ"
+                explanation: "✅ <b>Explanation:</b><br><b>C. Log Analytics agent for Azure VMs</b> is correct.<br>" +
+							 "เซิร์ฟเวอร์บนคลาวด์จะเก็บ Log ความปลอดภัย (เช่น Event Viewer) ไว้ในเครื่องตัวเอง ถ้าอยากให้ Defender for Cloud มองเห็นเหตุการณ์เหล่านั้น มันต้องมี "สายลับ" คอยดูด Log และส่งกลับศูนย์<br>" +
+							 "Log Analytics agent (หรือชื่อเดิมคือ Microsoft Monitoring Agent - MMA)หน้าที่ของมันคือรวบรวม Security Events จาก OS แล้ว Forward ขึ้นคลาวด์ให้ Defender นำไปวิเคราะห์ต่อ<br>" +
+							 "ส่ง Security Log/Exploits ขึ้น Defender ➡️ ต้องมีคนส่งข้อมูลให้ ➡️ ตอบ Log Analytics agent เสมอ!<br>" +
+							 "<b>หมายเหตุ:</b><br>" +
+							 "ปัจจุบัน Microsoft กำลังทยอยบังคับให้ย้ายไปใช้ Azure Monitor Agent (AMA) แทน Log Analytics agent แล้วนะครับ แต่ในบริบทของข้อสอบที่ยังไม่อัปเดตชอยส์นี้ ให้ตอบข้อ C. ไปก่อนครับ"
             },
             // ==========================================
             // Question 13 
