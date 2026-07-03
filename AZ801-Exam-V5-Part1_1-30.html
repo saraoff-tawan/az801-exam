@@ -220,8 +220,11 @@
                 ],
                 explanation: "✅ <b>Explanation:</b><br>" +
                              "1. <b>Yes:</b> ServiceAccount1 is a member of the 'ServiceAccounts' group. The PSO is applied directly to this group and enforces a minimum password length of 16 characters.<br>" +
+						 	 "ServiceAccount1 เป็นสมาชิกของ Group ServiceAccounts ซึ่ง Group นี้ถูกผูกติดกับกฎ PSO เอาไว้ ดังนั้น ServiceAccount1 จึงโดนบังคับใช้กฎ 16 ตัวอักษรแทนกฎ 7 ตัวอักษรของโดเมน" +
                              "2. <b>No:</b> ServiceAccount2 is in the 'ServiceAccounts' OU, but NOT a member of the 'ServiceAccounts' security group. PSOs apply to users or groups, not OUs.<br>" +
-                             "3. <b>No:</b> The PSO enforces a minimum password length of 16 characters. The password 'P@$$w0rd1' is only 10 characters long, so it will be rejected."
+							 "ServiceAccount2 อยู่ใน OU ชื่อ ServiceAccounts ก็จริง แต่กฎ PSO ไม่ได้สนใจ OU ครับ กฎมันสนใจแค่ Group ซึ่ง ServiceAccount2 ไม่ได้เป็นสมาชิกของ Group ดังนั้น ServiceAccount2 จึงหลุดรอดจากกฎ PSO และกลับไปใช้กฎ Default Domain Policy คือ 7 ตัวอักษรตามเดิม" +
+                             "3. <b>No:</b> The PSO enforces a minimum password length of 16 characters. The password 'P@$$w0rd1' is only 10 characters long, so it will be rejected." +
+							 "กฎ PSO บังคับว่าต้องมีความยาวขั้นต่ำ 16 ตัวอักษร เรามาลองนับคำว่า P@$$w0rd1 ดูครับ... นับได้แค่ 9 ตัวอักษร เท่านั้น! ดังนั้นต่อให้ผ่านเกณฑ์ความซับซ้อน (Complexity) แต่ความยาวไม่ผ่าน ระบบก็เตะทิ้งอยู่ดี"
             },
             // ==========================================
             // Question 6 
