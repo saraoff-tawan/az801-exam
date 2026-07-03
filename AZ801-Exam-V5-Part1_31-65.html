@@ -389,23 +389,24 @@
             // Question 42 (Azure Key Vault ADE Encryption)
             // ==========================================
             {
-                type: "dropdown",
+                type: "inline_dropdown",
+				inlineTemplate:"az keyvault [DD0] create --name artifact1 --vault-name vault1 --kty [DD1] --size 4096",
                 question: "HOTSPOT - <br>You have an Azure subscription that contains an Azure key vault named Vault1.<br>You deploy Azure Disk Encryption. You configure Vault1 to support Azure Disk Encryption.<br><br>" +
                           "You need to ensure that you can encrypt Azure Disk Encryption artifacts before they are written to Vault1. The solution must provide the highest level of encryption.<br><br>" +
-                          "How should you complete the command? To answer, select the appropriate options in the answer area." +
+                          "How should you complete the command? To answer, select the appropriate options in the answer area.",
                           
                           // --- CSS Hack สำหรับข้อนี้โดยเฉพาะ (บังคับให้เรียงบรรทัดเดียว) ---
-                          "<style>" +
-                          "  #dropdown-container .dd-area { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; font-family: Consolas, monospace; font-size: 1.1em; background: #fff; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }" +
-                          "  #dropdown-container .dd-area h3, #dropdown-container .dd-area > br { display: none; }" +
-                          "  #dropdown-container .dd-row { margin-bottom: 0; margin-right: 5px; }" +
-                          "  #dropdown-container .dd-label { width: auto; margin-right: 8px; font-weight: normal; text-align: left; }" +
-                          "  #dropdown-container .dd-select { width: auto; font-family: 'Segoe UI', sans-serif; font-size: 0.9em; padding: 3px; }" +
-                          "  #dropdown-container .dd-area::after { content: '--size 4096'; margin-left: 5px; }" +
-                          "</style>" +
+                      //    "<style>" +
+                      //    "  #dropdown-container .dd-area { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; font-family: Consolas, monospace; font-size: 1.1em; background: #fff; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }" +
+                      //    "  #dropdown-container .dd-area h3, #dropdown-container .dd-area > br { display: none; }" +
+                      //    "  #dropdown-container .dd-row { margin-bottom: 0; margin-right: 5px; }" +
+                      //    "  #dropdown-container .dd-label { width: auto; margin-right: 8px; font-weight: normal; text-align: left; }" +
+                      //    "  #dropdown-container .dd-select { width: auto; font-family: 'Segoe UI', sans-serif; font-size: 0.9em; padding: 3px; }" +
+                      //    "  #dropdown-container .dd-area::after { content: '--size 4096'; margin-left: 5px; }" +
+                      //    "</style>" +
                           // -----------------------------------------------------------
                           
-                          "<div style='font-weight: bold; margin-top: 20px; margin-bottom: 10px;'>Answer Area</div>",
+                      //    "<div style='font-weight: bold; margin-top: 20px; margin-bottom: 10px;'>Answer Area</div>",
                 dropdowns: [
                     { 
                         id: "q42-dd1", 
@@ -421,23 +422,23 @@
                     }
                 ],
                 explanation: "✅ <b>Correct Answer:</b><br><br>" +
-                             "<div style='background: #fff; padding: 20px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 20px;'>" +
-                             "  <div style='font-weight: bold; margin-bottom: 15px;'>Answer Area</div>" +
-                             "  <div style='margin-bottom: 5px; font-family: Consolas, monospace; font-size: 1.1em;'>az keyvault</div>" +
-                             "  <div style='border: 1px solid #aaa; display: inline-block; background: white; min-width: 150px; font-size: 0.95em;'>" +
-                             "    <div style='padding: 3px 8px;'>certificate</div>" +
-                             "    <div style='padding: 3px 8px; border: 3px solid black; font-weight: bold;'>key</div>" +
-                             "    <div style='padding: 3px 8px;'>secret</div>" +
-                             "  </div>" +
-                             "  <div style='margin-top: 15px; margin-bottom: 5px; font-family: Consolas, monospace; font-size: 1.1em;'>create --name artifact1 --vault-name vault1 --kty</div>" +
-                             "  <div style='border: 1px solid #aaa; display: inline-block; background: white; min-width: 150px; font-size: 0.95em;'>" +
-                             "    <div style='padding: 3px 8px;'>EC</div>" +
-                             "    <div style='padding: 3px 8px;'>EC-HSM</div>" +
-                             "    <div style='padding: 3px 8px;'>RSA</div>" +
-                             "    <div style='padding: 3px 8px; border: 3px solid black; font-weight: bold;'>RSA-HSM</div>" +
-                             "  </div>" +
-                             "  <div style='margin-top: 15px; font-family: Consolas, monospace; font-size: 1.1em;'>--size 4096</div>" +
-                             "</div>" +
+                 //            "<div style='background: #fff; padding: 20px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 20px;'>" +
+                 //            "  <div style='font-weight: bold; margin-bottom: 15px;'>Answer Area</div>" +
+                 //            "  <div style='margin-bottom: 5px; font-family: Consolas, monospace; font-size: 1.1em;'>az keyvault</div>" +
+                 //            "  <div style='border: 1px solid #aaa; display: inline-block; background: white; min-width: 150px; font-size: 0.95em;'>" +
+                 //            "    <div style='padding: 3px 8px;'>certificate</div>" +
+                 //            "    <div style='padding: 3px 8px; border: 3px solid black; font-weight: bold;'>key</div>" +
+                 //            "    <div style='padding: 3px 8px;'>secret</div>" +
+                 //            "  </div>" +
+                 //            "  <div style='margin-top: 15px; margin-bottom: 5px; font-family: Consolas, monospace; font-size: 1.1em;'>create --name artifact1 --vault-name vault1 --kty</div>" +
+                 //            "  <div style='border: 1px solid #aaa; display: inline-block; background: white; min-width: 150px; font-size: 0.95em;'>" +
+                 //            "    <div style='padding: 3px 8px;'>EC</div>" +
+                 //            "    <div style='padding: 3px 8px;'>EC-HSM</div>" +
+                 //            "    <div style='padding: 3px 8px;'>RSA</div>" +
+                 //            "    <div style='padding: 3px 8px; border: 3px solid black; font-weight: bold;'>RSA-HSM</div>" +
+                 //            "  </div>" +
+                 //            "  <div style='margin-top: 15px; font-family: Consolas, monospace; font-size: 1.1em;'>--size 4096</div>" +
+                 //            "</div>" +
                              "<b>Explanation:</b><br>" +
                              "<b>1. az keyvault [key] create</b><br>Azure Disk Encryption (ADE) ทำงานโดยอาศัย <b>Key (KEK - Key Encryption Key)</b> ในการเข้ารหัสความลับครับ เราจึงต้องสร้าง Key ไม่ใช่ Secret หรือ Certificate<br><br>" +
                              "<b>2. --kty [RSA-HSM]</b><br>โจทย์ระบุว่าต้องการ <b>highest level of encryption</b> การใช้ <b>HSM (Hardware Security Module)</b> คือมาตรฐานความปลอดภัยสูงสุดที่คีย์จะถูกจัดการอยู่ในระดับฮาร์ดแวร์โดยเฉพาะ และ ADE รองรับคีย์ประเภท RSA "
