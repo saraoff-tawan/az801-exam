@@ -834,7 +834,13 @@
                         correctAnswer: "Computer (Kerberos V5)" 
                     }
                 ],
-                explanation: "✅ <b>Explanation:</b><br>1.Rule Type must be :Isolation.<br>2.Requirements must be :Require for inbound and outbound (to block non-domain).<br> 3.Method is :Computer (Kerberos V5).<br> <b>- Isolation :</b>เมื่อต้องการจำกัดให้เครื่องเซิร์ฟเวอร์คุยได้เฉพาะกลุ่มใดกลุ่มหนึ่ง (ในกรณีนี้คือกลุ่มเครื่องในโดเมน) ตามหลักของ Windows Firewall จะเรียกพฤติกรรมนี้ว่าการทำ Server Isolation หรือ Domain Isolation มันคือการ แยกกักบริเวณ เครื่องที่มีความสำคัญออกจากเครื่องทั่วไปที่ไม่ได้อยู่ในโดเมน<br><b>- Require authentication for inbound and outbound connections :</b>ในโจทย์คำว่า Only (ต้อง...เท่านั้น) ทั้งขาเข้า (accept) และขาออก (communicate) แปลว่าเราจะไม่มีการประนีประนอมใดๆ ทั้งสิ้นครับ ห้ามใช้ Request (ร้องขอ) เด็ดขาด เพราะถ้าใช้ Request แล้วอีกฝั่งไม่เข้ารหัส มันจะยอมลดระดับไปคุยแบบธรรมดา ซึ่งผิดกฎข้อนี้ <br><b>- Computer (Kerberos V5) :</b>โปรโตคอลหลักที่ Active Directory ใช้ในการยืนยันตัวตนว่าคอมพิวเตอร์เครื่องนี้เป็นลูกบ้านในโดเมนก็คือ Kerberos V5 "
+                explanation: "✅ <b>Explanation:</b><br>" +
+						     "<b>1.Rule Type must be : Isolation</b><br>" +
+							 "• เมื่อต้องการจำกัดให้เครื่องเซิร์ฟเวอร์คุยได้เฉพาะกลุ่มใดกลุ่มหนึ่ง (ในกรณีนี้คือกลุ่มเครื่องในโดเมน) ตามหลักของ Windows Firewall จะเรียกพฤติกรรมนี้ว่าการทำ Server Isolation หรือ Domain Isolation มันคือการ แยกกักบริเวณ เครื่องที่มีความสำคัญออกจากเครื่องทั่วไปที่ไม่ได้อยู่ในโดเมน<br>" +
+							 "<b>2.Requirements must be : Require authentication for inbound and outbound connections</b><br>" + 
+							 "• ในโจทย์คำว่า Only (ต้อง...เท่านั้น) ทั้งขาเข้า (accept) และขาออก (communicate) แปลว่าเราจะไม่มีการประนีประนอมใดๆ ทั้งสิ้นครับ ห้ามใช้ Request (ร้องขอ) เด็ดขาด เพราะถ้าใช้ Request แล้วอีกฝั่งไม่เข้ารหัส มันจะยอมลดระดับไปคุยแบบธรรมดา ซึ่งผิดกฎข้อนี้ <br>" +
+							 "3.<b>Method is : Computer (Kerberos V5)</b><br>" + 
+							 "• โปรโตคอลหลักที่ Active Directory ใช้ในการยืนยันตัวตนว่าคอมพิวเตอร์เครื่องนี้เป็นลูกบ้านในโดเมนก็คือ Kerberos V5 "
             },
             // ==========================================
             // Question 30 
