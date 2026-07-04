@@ -762,7 +762,11 @@
                 ],
                 explanation: "✅ <b>Correct Answer:</b><br><br>" +
                              "<b>Explanation:</b><br>" +
-                             "<b>เหตุผล:</b><br>1. <b>For the Domain Admins group:</b> เพื่อลดความเสี่ยง เราควรถอด Built-in Administrator ออกจากกลุ่ม Domain Admins (เพื่อป้องกันไม่ให้แฮกเกอร์จ้องโจมตีบัญชีนี้โดยตรง แต่บัญชีนี้ยังมีสิทธิ์ทำ Forest Recovery ได้อยู่)<br>2. <b>User rights:</b> ปรับ GPO ของ Member Servers และ Workstations เพื่อ <b>ปฏิเสธ (Deny)</b> ไม่ให้กลุ่ม Domain Admins สามารถ Log on (ทั้งแบบ Network, Service, Batch, Local, RDP) เข้าสู่เครื่องเหล่านั้นได้ เพื่อป้องกันการโดนขโมย Credential (Pass-the-Hash) ไปใช้ต่อครับ"
+                             "<b>เหตุผล:</b><br>" +
+							 "1. <b>For the Domain Admins group:</b>Remove the built-in administrator account<br>" +
+							 "• เพื่อลดความเสี่ยง เราควรถอด Built-in Administrator ออกจากกลุ่ม Domain Admins (เพื่อป้องกันไม่ให้แฮกเกอร์จ้องโจมตีบัญชีนี้โดยตรง แต่บัญชีนี้ยังมีสิทธิ์ทำ Forest Recovery ได้อยู่)<br>" +
+							 "2. <b>User rights:</b>Deny access to this computer from the network, .......,Deny log on through Remote Desktop Services user rights<br>" +
+							 "• ปรับ GPO ของ Member Servers และ Workstations เพื่อ <b>ปฏิเสธ (Deny)</b> ไม่ให้กลุ่ม Domain Admins สามารถ Log on (ทั้งแบบ Network, Service, Batch, Local, RDP) เข้าสู่เครื่องเหล่านั้นได้ เพื่อป้องกันการโดนขโมย Credential (Pass-the-Hash) ไปใช้ต่อครับ"
             },
             // ==========================================
             // Question 55 (Azure Disk Encryption KEK)
