@@ -724,7 +724,7 @@
 			     "- adprep /rodcprep ➡️ ต้องการติดต่อ Domain Naming Master<br>" +
 				 "<b>หมายเหตุ:</b>นี้คือ "บั๊ก" ที่โด่งดังมากในข้อสอบ Microsoft Dump ชุดนี้ครับ (ข้อสอบพิมพ์ผิด) ทาง Community และเฉลยต้นฉบับได้ฟันธงตรงกันว่า คนออกข้อสอบตั้งใจจะถามถึงคำสั่ง /forestprep แต่พิมพ์ผิดเป็น /domainprep ทำให้คำตอบที่ระบบตรวจให้คะแนนไปตกอยู่ที่ DC4" ,
             },
-            // ==========================================
+           // ==========================================
             // Question 54 (Harden Domain Admins)
             // ==========================================
             {
@@ -762,11 +762,13 @@
                 ],
                 explanation: "✅ <b>Correct Answer:</b><br><br>" +
                              "<b>Explanation:</b><br>" +
+                                                         "<b>Explanation:</b><br>" +
                              "<b>เหตุผล:</b><br>" +
 							 "1. <b>For the Domain Admins group:</b>Remove the built-in administrator account<br>" +
 							 "• คือการเตะ User1 กับ User2 ออกไป (เพื่อลดความเสี่ยงตามหลัก Least Privilege) และเก็บแค่บัญชี Built-in ไว้เป็น \"บัญชีฉุกเฉินทุบกระจก (Break-glass account)\"ยังมีสิทธิ์ทำ Forest Recovery ได้อยู่ สำหรับเคสระบบล่มเท่านั้น<br>" +
 							 "2. <b>User rights:</b>Deny access to this computer from the network,..... ,Deny log on through Remote Desktop Services user rights<br>" +
 							 "• ปรับ GPO ของ Member Servers และ Workstations เพื่อ <b>ปฏิเสธ (Deny)</b> ไม่ให้กลุ่ม Domain Admins สามารถ Log on (ทั้งแบบ Network, Service, Batch, Local, RDP) เข้าสู่เครื่องเหล่านั้นได้ เพื่อป้องกันการโดนขโมย Credential (Pass-the-Hash) ไปใช้ต่อครับ<br>"
+                //             "<b>เหตุผล:</b><br>1. <b>For the Domain Admins group:</b> เพื่อลดความเสี่ยง เราควรถอด Built-in Administrator ออกจากกลุ่ม Domain Admins (เพื่อป้องกันไม่ให้แฮกเกอร์จ้องโจมตีบัญชีนี้โดยตรง แต่บัญชีนี้ยังมีสิทธิ์ทำ Forest Recovery ได้อยู่)<br>2. <b>User rights:</b> ปรับ GPO ของ Member Servers และ Workstations เพื่อ <b>ปฏิเสธ (Deny)</b> ไม่ให้กลุ่ม Domain Admins สามารถ Log on (ทั้งแบบ Network, Service, Batch, Local, RDP) เข้าสู่เครื่องเหล่านั้นได้ เพื่อป้องกันการโดนขโมย Credential (Pass-the-Hash) ไปใช้ต่อครับ"
             },
             // ==========================================
             // Question 55 (Azure Disk Encryption KEK)
