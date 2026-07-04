@@ -180,7 +180,13 @@
                         expected: ["Configure Azure AD Password Protection"] 
                     }
                 ],
-                explanation: "✅ <b>Explanation:</b><br>1. <b>On DC1:</b> Install the <i>Azure AD Password Protection DC agent</i>.<br>2. <b>On a member server:</b> Install the <i>proxy service</i> since DC1 doesn't have internet access.<br>3. <b>In Azure:</b> <i>Configure Azure AD Password Protection</i>."
+                explanation: "✅ <b>Explanation:</b><br>" +
+						     "1. <b>On DC1:</b> Install the Azure AD Password Protection DC agent.<br>" +
+							 "• ลง Agent ไว้ที่ DC เพื่อให้มันคอยอ่านกฎและเตะรหัสผ่านที่ผิดเงื่อนไขทิ้ง<br>" +
+							 "2. <b>On a member server:</b> Install the <i>proxy service</i> since DC1 doesn't have internet access.<br>" +
+							 "• โจทย์บอกชัดเจนว่า DC1 ออกเน็ตไม่ได้จึงต้องเอาเซิร์ฟเวอร์ลูกข่าย (Member server) เครื่องอื่นที่ออกเน็ตได้ มาทำหน้าที่เป็น Proxy เพื่อดาวน์โหลด Policy จาก Azure แล้วค่อยส่งต่อเข้าไปให้ DC1 ภายในวงแลน<br>" +
+							 "3. <b>In Azure:</b>Configure Azure AD Password Protection.<br>" +
+						     "• เข้าไปเปิดใช้งานและพิมพ์ชื่อบริษัทลงใน Custom Banned Password List บนหน้าเว็บพอร์ทัลของ Azure ก่อน"
             },
             // ==========================================
             // Question 5 (HOTSPOT Matrix - แยก 3 รูป พร้อมหัวข้อ)
