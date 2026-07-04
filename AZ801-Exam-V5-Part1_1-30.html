@@ -474,32 +474,32 @@
                           "PS C:\\> Get-BitLockerVolume -MountPoint C,D | fl *\n\n" +
                           "ComputerName           : Server1\n" +
                           "MountPoint             : C:\n" +
-                          "EncryptionMethod       : XtsAes128\n" +
+                          "EncryptionMethod       : None\n" +
                           "AutoUnlockEnabled      : \n" +
-                          "AutoUnlockKeyStored    : False\n" +
-                          "MetadataVersion        : 2\n" +
+                          "AutoUnlockKeyStored    : \n" +
+                          "MetadataVersion        : 0\n" +
                           "VolumeStatus           : FullyEncrypted\n" +
-                          "ProtectionStatus       : On\n" +
+                          "ProtectionStatus       : Off\n" +
                           "LockStatus             : Unlocked\n" +
-                          "EncryptionPercentage   : 100\n" +
+                          "EncryptionPercentage   : 0\n" +
                           "WipePercentage         : 0\n" +
                           "VolumeType             : OperatingSystem\n" +
-                          "CapacityGB             : 126\n" +
-                          "KeyProtector           : {Tpm}\n\n" +
+                          "CapacityGB             : 126.5107\n" +
+                          "KeyProtector           : {}\n\n" +
                           "ComputerName           : Server1\n" +
                           "MountPoint             : D:\n" +
-                          "EncryptionMethod       : XtsAes128\n" +
-                          "AutoUnlockEnabled      : \n" +
-                          "AutoUnlockKeyStored    : False\n" +
+                          "EncryptionMethod       : Aes128\n" +
+                          "AutoUnlockEnabled      : False\n" +
+                          "AutoUnlockKeyStored    : \n" +
                           "MetadataVersion        : 2\n" +
                           "VolumeStatus           : FullyEncrypted\n" +
                           "ProtectionStatus       : On\n" +
-                          "LockStatus             : Locked\n" +
+                          "LockStatus             : UnlockLocked\n" +
                           "EncryptionPercentage   : 100\n" +
                           "WipePercentage         : 0\n" +
                           "VolumeType             : Data\n" +
-                          "CapacityGB             : 250\n" +
-                          "KeyProtector           : {RecoveryPassword}" +
+                          "CapacityGB             : 126.5107\n" +
+                          "KeyProtector           : {Password, RecoveryPassword}" +
                           "</div><br>" +
                           "You need to ensure that volume D will be unlocked automatically when Server1 restarts.<br><br>How should you complete the command? To answer, select the appropriate options in the answer area.",
                 dropdowns: [
