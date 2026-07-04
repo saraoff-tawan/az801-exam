@@ -871,15 +871,15 @@
                     "Get-ClusterSharedVolume -Name 'Volume1' | Resume-ClusterResource"
                 ],
                 explanation: "✅ <b>Explanation:</b><br>" +
-							 "<b>Step 1:</b> Get-ClusterSharedVolume -Name \"Volume1\" | Suspend-ClusterResource<br>" +
+							 "<b>Step 1:</b> Get-ClusterSharedVolume -Name 'Volume1' | Suspend-ClusterResource<br>" +
 							 "• หยุดการทำงานชั่วคราว (Maintenance Mode)<br>" +
 							 "<b>Step 2:</b> Enable-BitLocker -MountPoint 'C:\\ClusterStorage\\Volume1' -RecoveryPasswordProtector<br>" +
 							 "• สั่งเปิด BitLocker บนไดรฟ์ (Enable BitLocker))<br>" +
 							 "<b>Step 3:</b> $KeyProtectorID = (Get-BitlockerVolume -MountPoint 'C:\\ClusterStorage\\Volume1').KeyProtector<br>" + 
 							 "• ดึงรหัสกุญแจ(KeyProtectorID)เก็บไว้ในตัวแปร)<br>" + 
-							 "<b>Step 4:</b> Get-ClusterSharedVolume \"Volume1\" | Set-ClusterParameter -Name BitLockerProtectorInfo ... -Create<br>" +
+							 "<b>Step 4:</b> Get-ClusterSharedVolume 'Volume1' | Set-ClusterParameter -Name BitLockerProtectorInfo ... -Create<br>" +
 							 "• แจกจ่ายกุญแจให้ Cluster รู้จัก(Set ClusterParameter)<br>" +
-							 "<b>Step 5:</b> Get-ClusterSharedVolume -Name \"Volume1\" | Resume-ClusterResource <br>" +
+							 "<b>Step 5:</b> Get-ClusterSharedVolume -Name 'Volume1' | Resume-ClusterResource <br>" +
 							 "• สั่ง Resume เพื่อให้ Volume1 กลับมาทำงานตามปกติ"
             }
         ];
