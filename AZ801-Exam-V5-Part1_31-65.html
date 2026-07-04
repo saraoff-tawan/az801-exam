@@ -870,8 +870,10 @@
                     "D. an inbound program rule",
                     "E. an outbound port rule"
                 ],
-                correctAnswerIndex: 0,
-                explanation: "✅ <b>Explanation:</b><br><b>A. an outbound program rule</b> is correct.<br><br><b>เหตุผล:</b> เพื่อที่จะบล็อกเฉพาะแอป <b>App1</b> ไม่ให้ส่งเมลออก (SMTP คือฝั่งขารอส่งออก Outbound) โดยไม่ไปกระทบโปรแกรมอื่นบนเครื่อง เราจึงต้องสร้าง <b>Outbound Program Rule</b> โดยเลือกชี้ Path ไปที่ตัว App1 โดยตรงและระบุให้บล็อกเฉพาะพอร์ตที่เกี่ยวข้องครับ (ถ้าเลือก Port rule โปรแกรมอื่นจะซวยไปด้วย)"
+                correctAnswerIndex: 2,
+                explanation: "✅ <b>Explanation:</b><br><b>C. an outbound custom rule</b> is correct.<br>" +
+							 "<b>เหตุผล:</b><br>" +
+							 "กฎแบบ Custom (กำหนดเอง) อนุญาตให้เราผสมเงื่อนไขได้อย่างละเอียด โดยเราสามารถตั้งค่าได้ว่า ให้บล็อกเฉพาะ App1 (Program) + และบล็อกเฉพาะพอร์ต 25 (Port) เท่านั้นโดยไม่กระทบการออกเว็บ HTTP เพราะพอร์ต 80/443 ยังเปิดอยู่"
             },
             // ==========================================
             // Question 60 (Connection Security Rules Routing)
