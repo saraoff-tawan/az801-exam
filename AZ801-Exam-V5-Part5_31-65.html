@@ -36,7 +36,13 @@
         .dd-box h4 { margin-top: 0; color: #555; text-align: center; margin-bottom: 15px;}
         .draggable { background: #0078d4; color: white; padding: 12px; margin-bottom: 10px; border-radius: 5px; cursor: grab; text-align: left; font-weight: 500; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
         .draggable:active { cursor: grabbing; }
-        
+
+		/* เพิ่มตรงนี้ */
+        .draggable.prefilled {
+         background: #28a745;
+        cursor: default;
+        }
+		
         /* กล่องเป้าหมายสำหรับลากวาง */
         .target-container { flex: 1; display: flex; flex-direction: column; gap: 15px; }
         .target-area { padding: 15px; border: 2px dashed #bbb; border-radius: 8px; background: #f0f8ff; min-height: 100px; }
