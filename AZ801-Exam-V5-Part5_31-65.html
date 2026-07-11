@@ -1424,7 +1424,7 @@ q.draggables.forEach((itemText, index) => {
         //        if (q.targets) {
         //            q.targets.forEach((target, index) => {
         //                targetsWrapper.innerHTML += `<div class="target-area" id="target-box-${index}" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="target-label">${target.label}</div></div>`;
-        //            });
+        //            }); style="cursor:default;background:#28a745;"
                 if (q.targets) {
                     q.targets.forEach((target, index) => {
 
@@ -1434,7 +1434,6 @@ q.draggables.forEach((itemText, index) => {
                 <div class="target-area" id="target-box-${index}">
                 <div class="target-label">${target.label}</div>
                 <div class="draggable"
-                     style="cursor:default;background:#28a745;"
                      draggable="false">
                     ${target.expected[0]}
                 </div>
