@@ -695,10 +695,14 @@
 							"Reset platform validation data after BitLocker recovery",
 							"Use enhanced Boot Confiruration Data validation profile"
                         ], 
-                        correctAnswer: "Choose how BitLocker-protected operating system drives can be recovered" 
+                        correctAnswer: "Choose how BitLocker-protected operating systems drives can be recovered" 
                     }
                 ],
-                explanation: "✅ <b>Explanation:</b><br>Since it's Generation 1 (no TPM), you must 'Require additional authentication at startup'. Also, you must configure 'Choose how BitLocker-protected OS drives can be recovered' to store keys in AD.<br>ทำ BitLocker ไดรฟ์ C บน VM Gen 1 (ไม่มี TPM)<br>➡️ ต้องปลดล็อกด้วย Require additional auth... / บังคับเก็บ Key ลง AD<br>➡️ ต้องไปตั้งค่าที่ Choose how... recovered"
+                explanation: "✅ <b>Explanation:</b><br>Since it's Generation 1 (no TPM), you must 'Require additional authentication at startup'. Also, you must configure 'Choose how BitLocker-protected OS drives can be recovered' to store keys in AD.<br>" +
+							 "ทำ BitLocker ไดรฟ์ C บน VM Gen 1 (ไม่มี TPM)<br>" +
+							 "➡️ ต้องปลดล็อกด้วย Require additional auth<br>" +
+							 "บังคับเก็บ Key ลง AD<br>" +
+							 "➡️ ต้องไปตั้งค่าที่ Choose how... recovered"
             },
             // ==========================================
             // Question 24
