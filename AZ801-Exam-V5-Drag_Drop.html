@@ -688,51 +688,6 @@
                 `
             },
             // ==========================================
-            // Question 14 (Topic2_39)
-            // ==========================================
-            {
-                topic: "Topic 2",
-                type: "dragdrop",
-                question: "DRAG DROP - <br>You have a Storage Spaces Direct cluster in a hyper-converged deployment. The cluster contains three nodes that run Windows Server 2022. The cluster hosts 20 Hyper-V virtual machines.<br><br>" +
-                          "You need to upgrade the servers to Windows Server 2025. The solution must meet the following requirements:<br>" +
-                          "• Minimize downtime of the virtual machines.<br>• Minimize administrative effort.<br><br>" +
-                          "Which four actions should you perform on each node in sequence? To answer, move the appropriate actions from the list of actions to the answer area and arrange them in the correct order.",
-                draggables: [
-                    "Disable storage maintenance mode and resume the node.",
-                    "Perform an in-place upgrade to Windows Server 2025.",
-                    "Run the Suspend-ClusterNode -Drain cmdlet.",
-                    "Perform a clean install of Windows Server 2025.",
-                    "Evict the node from the cluster.",
-                    "Manually move the virtual machines to another node.",
-                    "Place the server in storage maintenance mode."
-                ],
-                correctOrder: [
-                    "Run the Suspend-ClusterNode -Drain cmdlet.",
-                    "Place the server in storage maintenance mode.",
-                    "Perform an in-place upgrade to Windows Server 2025.",
-                    "Disable storage maintenance mode and resume the node."
-                ],
-                explanation: `
-                     ✅ <b>Explanation:</b><br>
-                     เป็นสถานการณ์การทำ Cluster OS Rolling Upgrade บนระบบ Hyper-converged ที่ใช้ Storage Spaces Direct (S2D) โดยเน้นเงื่อนไข \"ลด Downtime ของ VM\" และ \"ใช้ความพยายามในการบริหารจัดการน้อยที่สุด (Minimize administrative effort)\"<br>
-                     มาดูเฉลยลำดับที่ถูกต้องตาม Best Practice ของ Microsoft พร้อมคำอธิบาย<br>
-
-                     <b>✅ คำตอบ</b><br>
-                     
-                     <b>Step 1. :Run Suspend-ClusterNode -Drain cmdlet</b><br>
-                     - Drain จะสั่งให้ Cluster ทำการ Live Migration ย้าย VM ทั้งหมดออกจาก Node นี้ไปยัง Node อื่นที่เหลืออยู่โดยอัตโนมัติ ซึ่งตอบโจทย์ Minimize administrative effort ได้ดีกว่าการไปสั่ง Manually move ทีละเครื่อง<br>
-                     
-                     <b>Step 2. :Place the server in storage maintenance mode</b><br>
-                     -เมื่อไม่มี VM รันอยู่แล้ว เราต้องสั่งพักการใช้งาน Storage บนเครื่องนี้ เพื่อไม่ให้ระบบ S2D พยายามแจ้งเตือน Error หรือพยายาม Re-sync ข้อมูลอย่างรุนแรงในขณะที่เราปิดเครื่องอัปเกรด<br>
-                     
-                     <b>Step 3. :Perform an in-place upgrade to Windows Server 2025 </b><br>
-                     - ทำการอัปเกรดทับ OS เดิมจาก 2022 เป็น 2025 ซึ่งเป็นวิธีที่สะดวกที่สุดในการรักษาค่าคอนฟิกเดิมไว้<br>
-                     
-                     <b>Step 4. :Disable storage maintenance mode and resume the node</b><br>
-                     - เมื่ออัปเกรดเสร็จและเครื่องกลับมาออนไลน์ เราจะทำการปิดโหมดบำรุงรักษาของ Storage เพื่อเริ่มการ Re-sync ข้อมูล และสั่ง Resume Node เพื่อให้ Cluster กลับมาสั่งงาน Node นี้ได้ตามปกติ <br>เป็นแพทเทิร์นมาตรฐานของ Microsoft ในการอัปเกรดโหนด S2D
-                `
-            },
-            // ==========================================
             // Question 15 (Topic3_4)
             // ==========================================
             {
