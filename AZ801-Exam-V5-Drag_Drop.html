@@ -1913,10 +1913,11 @@
                 type: "dragdrop",
                 question: "DRAG DROP - <br>You have an on-premises server named Server1 that runs Windows Server.<br>You have an Azure subscription.<br>You create a Microsoft Sentinel workspace named Workspace1.<br>You need to ensure that Workspace1 can collect events from Server1 by using the Windows Security Events via AMA data connector.<br>You add Server1 to Azure Arc.<br><br>Which actions should you perform next in sequence? To answer, drag the appropriate actions to the correct order.",
                 draggables: [
-                    "Create a Data Collection Rule (DCR).",
-                    "Associate the Data Collection Rule (DCR) with Server1.",
-                    "Install the Log Analytics agent on Server1.",
-                    "Open Workspace1 in Microsoft Sentinel."
+                    "Add anew threat intelligence indicator.",
+                    "Add a new workbook.",
+                    "Create a new hunt.",
+                    "From the Windows Security Events via AMA connector, create a data collection rule(DCR).",
+                    "Install the Windows Security Events solution."
                 ],
                 targets: [
                     { 
@@ -1926,22 +1927,29 @@
                     },
                     { 
                         label: "Step 2", 
-                        expected: ["Create a Data Collection Rule (DCR)."] 
+                        expected: ["Install the Windows Security Events solution."] 
                     },
                     {   label: "Step 3",
-                        expected: ["Associate the Data Collection Rule (DCR) with Server1."]
+                        expected: ["From the Windows Security Events via AMA connector, create a data collection rule(DCR)."]
                     }
             
                 ],
-                explanation: "✅ <b>Explanation:</b><br>" +
-			     "<b>เหตุผล:</b><br>" +
-			     " ในกระบวนการใช้ Azure Monitor Agent (AMA) คุณไม่ได้คอนฟิกที่ตัว Agent ตรงๆ เหมือนสมัยก่อนแล้ว แต่ต้องไปตั้งค่าจากส่วนกลางผ่าน <b>Data Collection Rule (DCR)</b><br>" +
-			     "1. <b>Open Workspace1 in Microsoft Sentinel.</b><br>" +
-		    	     "•  ✅โจทย์ให้มาแล้ว<br>" +
-			     "2. <b>Create a Data Collection Rule (DCR):</b><br>" +
-			     "• สร้างกฎขึ้นมาก่อนว่าต้องการดึง Log ชนิดไหน และจะส่งไปที่ Workspace ไหน<br>" +
-			     "3. <b>Associate the Data Collection Rule (DCR) with Server1:</b><br>" +
-			     "• นำกฎนั้นไปผูก (Assign) เข้ากับ Server1 (ที่ต่อ Arc ไว้แล้ว) ระบบจะสั่งติดตั้งและจ่ายกฎให้ Server1 อัตโนมัติครับ"
+                explanation: `✅ <b>Explanation:</b><br>" +
+                 การจะใช้ Azure Monitor Agent (AMA) ใน Microsoft Sentinel ต้องทำตาม Workflow มาตรฐานดังนี้:<br>
+
+                 ✅ <b>ลำดับที่ถูกต้อง (Correct Sequence):</b><br>
+
+			     Step 1. <b>Open Workspace1 in Microsoft Sentinel.</b><br>
+		    	 •  ✅โจทย์ให้มาแล้ว<br>
+
+                 <b>1. Step 2: ทำไมต้อง Install Solution ก่อน?</b><br>
+                 • ในสถาปัตยกรรมปัจจุบันของ Sentinel เครื่องมือเชื่อมต่อข้อมูล (Data Connectors) ต่างๆ จะถูกแพ็กเกจรวมไว้ในสิ่งที่เรียกว่า "Solutions" (ดาวน์โหลดจากหน้า Content Hub)<br>
+                 ดังนั้นก่อนที่คุณจะเรียกใช้หน้าต่างตั้งค่าของ Data Connector ได้ คุณต้องทำการติดตั้ง "Windows Security Events solution" ลงใน Workspace เสียก่อน<br>
+
+                 <b>2. Step 3: ทำไมต้องสร้าง DCR (Data Collection Rule)?</b><br>
+                 • เมื่อคุณติดตั้ง Solution และเปิดหน้าตั้งค่าของ Windows Security Events via AMA connector แล้ว กลไกหลักที่ AMA ใช้ในการตัดสินใจว่าจะไปดึงข้อมูลอะไรบ้างจาก Server1 คือ Data Collection Rule (DCR)<br>
+                 ในขั้นตอนนี้คุณจะต้องสร้าง DCR เพื่อกำหนดว่าให้ไปดึง Log จากเครื่องไหน (ในที่นี้คือ Server1 ที่ต่อ Arc ไว้แล้ว) และดึง Event ระดับไหน (เช่น All, Common, Minimal)
+            `
             },
            // ==========================================
             // Question 45 (Topic5_51)
